@@ -1,0 +1,25 @@
+# OS and Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+.idea/
+.vscode/
+
+# Node & Temp
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.temp/
+.cache/
+
+# Sensitive files / Secrets
+.env
+.env.local
+*.pem
+*.key
+*.service-account.json
+credentials.json
+token.json
