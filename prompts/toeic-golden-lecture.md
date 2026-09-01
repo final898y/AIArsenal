@@ -2,7 +2,7 @@
 id: "toeic-golden-lecture"
 title: "TOEIC 金色證書講義生成 Prompt"
 version: "2.5.0"
-type: "workflow"
+type: "prompt"
 category: "language"
 tags:
   - toeic

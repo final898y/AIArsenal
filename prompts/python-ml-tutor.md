@@ -2,7 +2,7 @@
 id: "python-ml-tutor"
 title: "Python & ML 零基礎學習導師"
 version: "1.0.0"
-type: "gem"
+type: "prompt"
 category: "education"
 tags:
   - python

@@ -9,10 +9,9 @@
 倉庫採用分類分層管理，結構如下：
 
 ```text
-├── prompts/                      # 存放各類 Prompt 與 Gemini Gems
-│   ├── gems/                     # Google Gemini Gems 專用 Prompt
-│   ├── workflows/                # 複合型多步驟工作流 Prompt
-│   └── templates/                # 通用結構範本
+├── prompts/                      # 存放各類通用 Prompt / Gemini Gems
+│   ├── <prompt-id>.md            # 各別 Prompt 檔案
+│   └── archive/                  # 重大歷史版本快照
 ├── skills/                       # Antigravity / AI Agent Skills
 │   └── <skill-name>/             # 獨立 Skill 資料夾 (含 SKILL.md 等)
 ├── scripts/                      # 程式碼與自動化腳本
@@ -36,7 +35,7 @@
 id: "unique-kebab-case-id"           # [必填] 唯一識別代碼，例如: python-ml-tutor
 title: "檔案名稱 / 工具名稱"           # [必填] 繁體中文或英文易讀名稱
 version: "1.0.0"                    # [必填] 語意化版本號 (SemVer)
-type: "gem"                         # [必填] 類型: gem | prompt | skill | workflow
+type: "prompt"                      # [必填] 類型: prompt | skill
 category: "education"               # [必填] 分類: education | coding | productivity | automation | language
 tags:                               # [必填] 標籤陣列，利於搜尋與索引
   - python

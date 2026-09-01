@@ -35,9 +35,11 @@
 
 ```text
 .
-├── prompts/                         # 提示詞庫與 Gemini Gems
-│   ├── gems/                        # 專用於 Google Gemini Gems 的設定檔
-│   ├── workflows/                   # 複雜任務工作流 / 轉換型 Prompts
+├── prompts/                         # 提示詞庫與 Gemini Gems (統一收錄)
+│   ├── python-ml-tutor.md           # Python & ML 零基礎學習導師
+│   ├── shadowing-coach.md           # Shadowing（跟讀）教練
+│   ├── toeic-golden-lecture.md      # TOEIC 金色證書講義生成
+│   ├── markdown-course-converter.md # AI 課程轉 Markdown 筆記
 │   └── archive/                     # 歷史重大版本快照 (提供離線對照)
 ├── skills/                          # AI Agent 技能 (含 SKILL.md 與輔助工具)
 ├── scripts/                         # 程式碼與自動化工具
@@ -52,14 +54,14 @@
 
 ## 📑 資源索引目錄
 
-### 1. Gemini Gems & 提示詞庫 (Prompts)
+### 1. 提示詞與 Gemini Gems 庫 (Prompts)
 
 | ID | 名稱 | 類別 | 目標平台 / 模型 | 最新版本 | 檔案路徑 | 說明 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `python-ml-tutor` | Python & ML 零基礎學習導師 | 教育 / 程式 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/gems/python-ml-tutor.md`](prompts/gems/python-ml-tutor.md) | 為零基礎自學者拆解 ML 程式碼與語法原理 |
-| `shadowing-coach` | Shadowing（跟讀）教練 | 語言學習 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/gems/shadowing-coach.md`](prompts/gems/shadowing-coach.md) | 英文跟讀口說訓練與發音弱點即時糾錯 |
-| `toeic-golden-lecture` | TOEIC 金色證書講義生成 | 語言學習 | General / Pro | `v1.0.0` | [`prompts/workflows/toeic-golden-lecture.md`](prompts/workflows/toeic-golden-lecture.md) | 依據多益題庫與句構生成高擬真金色證書講義 |
-| `markdown-course-converter`| AI 課程轉 Markdown 筆記 | 內容轉化 | General / 1.5 Pro | `v1.0.0` | [`prompts/workflows/markdown-course-converter.md`](prompts/workflows/markdown-course-converter.md) | 將線上課程文字重組為高結構化 Markdown 筆記 |
+| `python-ml-tutor` | Python & ML 零基礎學習導師 | 教育 / 程式 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/python-ml-tutor.md`](prompts/python-ml-tutor.md) | 為零基礎自學者拆解 ML 程式碼與語法原理 |
+| `shadowing-coach` | Shadowing（跟讀）教練 | 語言學習 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/shadowing-coach.md`](prompts/shadowing-coach.md) | 英文跟讀口說訓練與發音弱點即時糾錯 |
+| `toeic-golden-lecture` | TOEIC 金色證書講義生成 | 語言學習 | General / Pro | `v2.5.0` | [`prompts/toeic-golden-lecture.md`](prompts/toeic-golden-lecture.md) | 依據多益題庫與句構生成高擬真金色證書講義 |
+| `markdown-course-converter`| AI 課程轉 Markdown 筆記 | 內容轉化 | General / 1.5 Pro | `v1.0.0` | [`prompts/markdown-course-converter.md`](prompts/markdown-course-converter.md) | 將線上課程文字重組為高結構化 Markdown 筆記 |
 
 ---
 

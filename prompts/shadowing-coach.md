@@ -2,7 +2,7 @@
 id: "shadowing-coach"
 title: "Shadowing（跟讀）教練"
 version: "1.0.0"
-type: "gem"
+type: "prompt"
 category: "language"
 tags:
   - english

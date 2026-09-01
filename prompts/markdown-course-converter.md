@@ -2,7 +2,7 @@
 id: "markdown-course-converter"
 title: "AI 課程章節轉 Markdown 學習筆記 Prompt"
 version: "1.0.0"
-type: "workflow"
+type: "prompt"
 category: "education"
 tags:
   - markdown
