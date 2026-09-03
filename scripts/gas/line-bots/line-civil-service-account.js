@@ -1,13 +1,13 @@
 /**
  * @file line-civil-service-account.js
- * @description LINE 公務帳號自動回覆機器人（具備上下班時間與週末自動判斷、緊急聯絡資訊提示）
- * @version 1.0.0
+ * @description LINE 公務帳號自動回覆機器人（全 Flex Message 介面、前後綴指令觸發、上下班時間自動判斷）
+ * @version 2.0.0
  * @author ai-arsenal
  * @trigger Webhook (doPost)
- * 
+ *
  * 必要 Script Properties (專案設定 -> 指令碼屬性):
  * - LINE_CHANNEL_ACCESS_TOKEN: LINE Messaging API Token
- * 
+ *
  * 關聯服務:
  * - LINE Messaging API
  * - Google Apps Script Utilities (時區處理)
@@ -15,14 +15,14 @@
 
 // 讀取 Channel Access Token
 const props = PropertiesService.getScriptProperties();
-const CHANNEL_ACCESS_TOKEN = props.getProperty('LINE_CHANNEL_ACCESS_TOKEN') || '';
+const CHANNEL_ACCESS_TOKEN =
+  props.getProperty("LINE_CHANNEL_ACCESS_TOKEN") || "";
 
 /**
  * LINE Webhook 進入點（函數名稱不可變更）
  */
 function doPost(e) {
   try {
-    // 防錯：檢查 request postData 是否存在
     if (!e || !e.postData || !e.postData.contents) {
       return createSuccessResponse();
     }
@@ -30,15 +30,17 @@ function doPost(e) {
     const json = JSON.parse(e.postData.contents);
     const events = json.events;
 
-    // 防錯：處理 LINE Verify 測試連線（events 為空陣列）
     if (!events || events.length === 0) {
       return createSuccessResponse();
     }
 
     const event = events[0];
 
-    // 僅處理「使用者傳送文字訊息」事件（忽略貼圖、圖片、退群等）
-    if (event.type !== 'message' || !event.message || event.message.type !== 'text') {
+    if (
+      event.type !== "message" ||
+      !event.message ||
+      event.message.type !== "text"
+    ) {
       return createSuccessResponse();
     }
 
@@ -47,36 +49,29 @@ function doPost(e) {
       return createSuccessResponse();
     }
 
-    const now = new Date();
-    const timeString = getTaiwanTimeString(now);
-    let messageText = '';
+    const userMessage = event.message.text.trim().toLowerCase();
+    const helpCommands = [".help", ".說明", ".指令", ".幫助"];
 
-    // 判斷是否為上班時間（週一至週五 08:00–17:00）
-    if (isWorkingHours(now)) {
-      messageText = 
-`您好！
-本帳號為新竹市政府產業發展處生態保育科，賴俊辰承辦之公務帳號。
-目前時間：${timeString}
+    let flexMessageObject = null;
 
-收到您的訊息，我會儘速檢視並依序回覆，請您稍加等待。
-
-如有緊急需求，請撥打專線電話：(03) 521-6121 #405 或 0919-970-243，謝謝！`;
+    // 1. 觸發 Help 指令
+    if (helpCommands.includes(userMessage)) {
+      flexMessageObject = getHelpFlexMessage();
     } else {
-      messageText = 
-`您好！
-本帳號為新竹市政府產業發展處生態保育科，賴俊辰承辦之公務帳號。
-目前時間：${timeString}（非上班時間）
+      // 2. 自動判斷上班/下班時間
+      const now = new Date();
+      const timeString = getTaiwanTimeString(now);
 
-您的訊息已成功送出，將於下一個工作天的上班時間（週一至週五 08:00–17:00）統一處理與回應。
-
-如有緊急需求，請於上班時間撥打專線電話：(03) 521-6121 #405 或 0919-970-243，謝謝！`;
+      if (isWorkingHours(now)) {
+        flexMessageObject = getWorkingHoursFlexMessage(timeString);
+      } else {
+        flexMessageObject = getOffHoursFlexMessage(timeString);
+      }
     }
 
-    // 發送回應
-    replyMessage(replyToken, messageText);
-
+    // 發送 Flex Message
+    replyFlexMessage(replyToken, flexMessageObject);
   } catch (error) {
-    // 紀錄例外 Log 供排錯，並確保依然回傳 200 給 LINE
     Logger.log("Error in doPost: " + error.toString());
   }
 
@@ -84,25 +79,395 @@ function doPost(e) {
 }
 
 /**
+ * 1. 取得 Help / 服務說明 Flex Message
+ */
+function getHelpFlexMessage() {
+  return {
+    type: "flex",
+    altText: "生態保育科公務帳號服務說明",
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box",
+        layout: "vertical",
+        spacing: "xs",
+        contents: [
+          {
+            type: "text",
+            text: "新竹市政府產業發展處生態保育科",
+            weight: "bold",
+            color: "#1DB446",
+            size: "sm",
+          },
+          {
+            type: "text",
+            text: "公務帳號服務與查詢指引",
+            weight: "bold",
+            size: "xl",
+            margin: "xs",
+            wrap: true,
+          },
+          {
+            type: "text",
+            text: "承辦人：賴俊辰",
+            size: "xs",
+            color: "#888888",
+            margin: "xs",
+          },
+        ],
+      },
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            contents: [
+              {
+                type: "text",
+                text: "服務項目",
+                weight: "bold",
+                size: "md",
+              },
+              {
+                type: "text",
+                text: "• 山坡地開發水土保持案件申請\n• 山坡地違規案件通報\n• 山坡地道路兩側路樹修剪",
+                size: "sm",
+                color: "#666666",
+                wrap: true,
+              },
+            ],
+          },
+          {
+            type: "separator",
+            margin: "md",
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "md",
+            spacing: "sm",
+            contents: [
+              {
+                type: "text",
+                text: "服務時間",
+                weight: "bold",
+                size: "md",
+              },
+              {
+                type: "text",
+                text: "週一至週五 08:00–17:00（國定假日除外）",
+                size: "sm",
+                color: "#666666",
+                wrap: true,
+              },
+            ],
+          },
+          {
+            type: "separator",
+            margin: "md",
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "md",
+            spacing: "xs",
+            contents: [
+              {
+                type: "text",
+                text: "緊急聯絡電話",
+                weight: "bold",
+                size: "md",
+              },
+              {
+                type: "text",
+                text: "辦公室：(03) 521-6121 #405",
+                size: "sm",
+                color: "#666666",
+              },
+              {
+                type: "text",
+                text: "公務手機：0919-970-243",
+                size: "sm",
+                color: "#666666",
+              },
+            ],
+          },
+        ],
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        spacing: "sm",
+        contents: [
+          {
+            type: "button",
+            style: "primary",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "查詢山坡地範圍",
+              uri: "https://serv.ardswc.gov.tw/B/",
+            },
+            color: "#2D6A4F",
+          },
+          {
+            type: "button",
+            style: "secondary",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "查詢土地地段地號",
+              uri: "https://eghouse.hccg.gov.tw/webgis/",
+            },
+          },
+          {
+            type: "button",
+            style: "link",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "撥打辦公室電話",
+              uri: "tel:035216121,405",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
+
+/**
+ * 2. 取得上班時間 Flex Message
+ */
+function getWorkingHoursFlexMessage(timeString) {
+  return {
+    type: "flex",
+    altText: "訊息已收到，將儘速回覆",
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box",
+        layout: "vertical",
+        spacing: "xs",
+        contents: [
+          {
+            type: "text",
+            text: "新竹市政府產業發展處生態保育科",
+            weight: "bold",
+            color: "#1DB446",
+            size: "sm",
+          },
+          {
+            type: "text",
+            text: "訊息已成功送出",
+            weight: "bold",
+            size: "xl",
+            margin: "xs",
+          },
+          {
+            type: "text",
+            text: "承辦人：賴俊辰",
+            size: "xs",
+            color: "#888888",
+            margin: "xs",
+          },
+        ],
+      },
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: `收到您的訊息，承辦人會儘速檢視並依序回覆，請您稍加等待。`,
+            size: "sm",
+            color: "#333333",
+            wrap: true,
+          },
+          {
+            type: "separator",
+            margin: "md",
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "md",
+            spacing: "xs",
+            contents: [
+              {
+                type: "text",
+                text: "接收時間",
+                weight: "bold",
+                size: "xs",
+                color: "#888888",
+              },
+              {
+                type: "text",
+                text: timeString,
+                size: "sm",
+                color: "#666666",
+              },
+            ],
+          },
+        ],
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        spacing: "sm",
+        contents: [
+          {
+            type: "button",
+            style: "primary",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "緊急聯絡：撥打辦公室",
+              uri: "tel:035216121,405",
+            },
+            color: "#2D6A4F",
+          },
+          {
+            type: "button",
+            style: "secondary",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "緊急聯絡：撥打公務手機",
+              uri: "tel:0919970243",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
+
+/**
+ * 3. 取得非上班時間 Flex Message
+ */
+function getOffHoursFlexMessage(timeString) {
+  return {
+    type: "flex",
+    altText: "目前為非上班時間，訊息已記錄",
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box",
+        layout: "vertical",
+        spacing: "xs",
+        contents: [
+          {
+            type: "text",
+            text: "新竹市政府產業發展處生態保育科",
+            weight: "bold",
+            color: "#E63946",
+            size: "sm",
+          },
+          {
+            type: "text",
+            text: "目前為非上班時間",
+            weight: "bold",
+            size: "xl",
+            margin: "xs",
+          },
+          {
+            type: "text",
+            text: "承辦人：賴俊辰",
+            size: "xs",
+            color: "#888888",
+            margin: "xs",
+          },
+        ],
+      },
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: "您的訊息已成功送出，將於下一個工作天的上班時間（週一至週五 08:00–17:00）統一處理與回應。",
+            size: "sm",
+            color: "#333333",
+            wrap: true,
+          },
+          {
+            type: "separator",
+            margin: "md",
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "md",
+            spacing: "xs",
+            contents: [
+              {
+                type: "text",
+                text: "接收時間",
+                weight: "bold",
+                size: "xs",
+                color: "#888888",
+              },
+              {
+                type: "text",
+                text: `${timeString}（非上班時間）`,
+                size: "sm",
+                color: "#666666",
+                wrap: true,
+              },
+            ],
+          },
+        ],
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        spacing: "sm",
+        contents: [
+          {
+            type: "button",
+            style: "secondary",
+            height: "sm",
+            action: {
+              type: "message",
+              label: "查看服務與查詢指引",
+              text: ".help",
+            },
+          },
+          {
+            type: "button",
+            style: "link",
+            height: "sm",
+            action: {
+              type: "uri",
+              label: "上班時間撥打專線",
+              uri: "tel:035216121,405",
+            },
+          },
+        ],
+      },
+    },
+  };
+}
+
+/**
  * 判斷是否為上班時間（週一至週五 08:00 - 17:00）
- * 使用 GAS 内建 Utilities 避免伺服器跨國時區偏差
  */
 function isWorkingHours(date) {
   const timeZone = "Asia/Taipei";
-  
-  // 取得星期幾：1 (Mon) - 7 (Sun)
   const dayOfWeek = parseInt(Utilities.formatDate(date, timeZone, "u"), 10);
-  
-  // 取得小時與分鐘 HHmm (例：0800, 1659, 1700)
-  const currentTime = parseInt(Utilities.formatDate(date, timeZone, "HHmm"), 10);
+  const currentTime = parseInt(
+    Utilities.formatDate(date, timeZone, "HHmm"),
+    10,
+  );
 
-  // 1. 判斷週末 (6 = 週六, 7 = 週日)
   if (dayOfWeek === 6 || dayOfWeek === 7) {
     return false;
   }
 
-  // 2. 判斷時間是否在 08:00 (0800) 到 16:59 (1659) 之間
-  // 滿 17:00 (1700) 即算下班時間
   if (currentTime >= 800 && currentTime < 1700) {
     return true;
   }
@@ -111,12 +476,12 @@ function isWorkingHours(date) {
 }
 
 /**
- * 格式化台灣時間字串 (例：2026/08/30 (週日) 20:56)
+ * 格式化台灣時間字串
  */
 function getTaiwanTimeString(date) {
   const timeZone = "Asia/Taipei";
-  const days = ['', '週一', '週二', '週三', '週四', '週五', '週六', '週日'];
-  
+  const days = ["", "週一", "週二", "週三", "週四", "週五", "週六", "週日"];
+
   const dayOfWeek = parseInt(Utilities.formatDate(date, timeZone, "u"), 10);
   const formattedDate = Utilities.formatDate(date, timeZone, "yyyy/MM/dd");
   const formattedTime = Utilities.formatDate(date, timeZone, "HH:mm");
@@ -125,30 +490,35 @@ function getTaiwanTimeString(date) {
 }
 
 /**
- * 發送 LINE Reply Message API
+ * 發送 LINE Flex Message API
  */
-function replyMessage(replyToken, text) {
-  const url = 'https://api.line.me/v2/bot/message/reply';
+function replyFlexMessage(replyToken, flexObject) {
+  const url = "https://api.line.me/v2/bot/message/reply";
   const payload = {
     replyToken: replyToken,
-    messages: [{ type: 'text', text: text }]
+    messages: [flexObject],
   };
 
   const options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     headers: {
-      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN
+      Authorization: "Bearer " + CHANNEL_ACCESS_TOKEN,
     },
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true // 防止 LINE API 報錯直接砸毀腳本
+    muteHttpExceptions: true,
   };
 
   const response = UrlFetchApp.fetch(url, options);
   const responseCode = response.getResponseCode();
-  
+
   if (responseCode !== 200) {
-    Logger.log("LINE Reply Error Code: " + responseCode + ", Response: " + response.getContentText());
+    Logger.log(
+      "LINE Reply Flex Error Code: " +
+        responseCode +
+        ", Response: " +
+        response.getContentText(),
+    );
   }
 }
 
@@ -156,6 +526,7 @@ function replyMessage(replyToken, text) {
  * 統一回傳 HTTP 200 給 LINE 伺服器
  */
 function createSuccessResponse() {
-  return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(
+    JSON.stringify({ status: "success" }),
+  ).setMimeType(ContentService.MimeType.JSON);
 }
