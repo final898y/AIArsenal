@@ -1,7 +1,7 @@
 ---
 id: "markdown-course-auditor"
 title: "Markdown 課程講義審核、校對與修訂改寫 Prompt"
-version: "1.0.0"
+version: "1.1.0"
 type: "prompt"
 category: "education"
 tags:
@@ -110,7 +110,11 @@ summary: "深度稽核課程講義與 Markdown 筆記之內容疏漏、技術邏
   > **核心目的 (Purpose)**：...
   > **運作機制 (How it Works)**：...
   > **關鍵價值 (Why it Matters)**：...
-- **Mermaid 圖表檢查**：檢驗 Mermaid 語法是否符合標準（如節點文字若含括號、特殊符號必須加上雙引號 `id["名稱 (說明)"]`），防止渲染崩潰。
+- **Mermaid 圖表與呈現優先級 (Markdown-First & Obsidian Compatibility)**：
+  - **原生 Markdown 優先原則 (Markdown-First)**：優先採用原生 Markdown 語法（如階層標題、條列清單、Markdown 比較表格或引用區塊）呈現觀念與架構，保持內容輕量與最高跨平台相容性。
+  - **Mermaid 使用時機限制**：僅在流程結構極為複雜、多向相依或非線性關係，且原生 Markdown 表格/清單無法清晰傳達時，才需要繪製 Mermaid 圖表。
+  - **Obsidian 渲染相容性**：所有 Mermaid 圖表必須使用標準代碼區塊 \`\`\`mermaid 與 \`\`\` 包覆，確保 Obsidian 筆記工具能夠準確識別並渲染圖表。
+  - **節點與引號合法性**：節點文字若含有括號、空白或特殊字元，必須強制加上雙引號（例如：`id["名稱 (說明)"]`），避免語法錯誤 (Syntax Error) 導致渲染中斷。
 - **表格結構規範**：所有表格必須包含對齊標頭，避免空欄位或未閉合分隔線。
 
 ### 維度 6：自我檢驗題與學習成效驗收 (Assessment & Self-check Validity)
@@ -169,4 +173,5 @@ summary: "深度稽核課程講義與 Markdown 筆記之內容疏漏、技術邏
 
 | 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
 | :--- | :--- | :--- | :--- |
+| `1.1.0` | 2026-09-19 | 強化 Mermaid 與 Obsidian 規範 | 新增原生 Markdown 優先原則、限定 Mermaid 僅用於複雜結構，並強制使用 ```mermaid 圍欄以相容 Obsidian |
 | `1.0.0` | 2026-09-19 | 初版發布 | 與 `markdown-course-converter` 搭配，建立雙模態審核、六大稽核維度、三級嚴重度診斷表與完整改寫輸出規範 |

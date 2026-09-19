@@ -1,7 +1,7 @@
 ---
 id: "markdown-course-converter"
 title: "AI 課程章節轉 Markdown 學習筆記 Prompt"
-version: "1.0.0"
+version: "1.1.0"
 type: "prompt"
 category: "education"
 tags:
@@ -17,7 +17,7 @@ target_models:
   - "claude-3.5-sonnet"
 author: "ai-arsenal"
 created_at: "2026-09-02"
-updated_at: "2026-09-02"
+updated_at: "2026-09-19"
 variables:
   - name: "course_content"
     description: "從線上學習平台（Coursera, DeepLearning.AI 等）複製的章節內容或逐字稿"
@@ -67,8 +67,11 @@ Produce a complete Markdown learning note that **preserves all knowledge** while
 > **How it Works** (運作機制)
 > **Why it Matters** (重要性)
 
-### 5. 概念關聯圖 (Concept Relationships)
-適時加入文字或 Mermaid 架構圖，呈現上下游與因果依賴關係。
+### 5. 概念關聯圖與呈現優先級 (Concept Relationships & Mermaid Rules)
+- **原生 Markdown 優先原則 (Markdown-First)**：優先採用原生 Markdown 語法（如階層標題、縮排清單、Markdown 比較表格或引用區塊）呈現觀念、上下游與因果依賴關係，確保筆記輕量且具備最高跨平台相容性。
+- **Mermaid 使用時機限制**：僅在流程結構極為複雜、多向相依或非線性關係，且原生 Markdown 表格/清單無法清晰傳達時，才需要繪製 Mermaid 圖表。
+- **Obsidian 渲染相容性**：繪製 Mermaid 圖表時，必須使用標準圍欄代碼塊 \`\`\`mermaid 與 \`\`\` 包覆，確保在 Obsidian 等 Markdown 工具中能正確識別並即時渲染。
+- **節點與引號合法性**：節點文字若含有括號、空白或特殊符號，必須強制加上雙引號（例如：`id["名稱 (說明)"]`），防止語法錯誤 (Syntax Error) 造成渲染崩潰。
 
 ### 6. 表格比較與範例 (Comparisons & Examples)
 - 將對比概念整理為 Markdown 表格。
@@ -103,4 +106,5 @@ Produce a complete Markdown learning note that **preserves all knowledge** while
 
 | 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
 | :--- | :--- | :--- | :--- |
+| `1.1.0` | 2026-09-19 | 強化 Mermaid 與 Obsidian 規範 | 引入原生 Markdown 優先原則、限縮 Mermaid 僅用於複雜結構，並規範 ```mermaid 圍欄以支援 Obsidian |
 | `1.0.0` | 2026-09-02 | 整合標準規範 | 加入 YAML Frontmatter 與標準章節架構 |
