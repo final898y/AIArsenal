@@ -40,6 +40,7 @@
 │   ├── shadowing-coach.md           # Shadowing（跟讀）教練
 │   ├── toeic-golden-lecture.md      # TOEIC 金色證書講義生成
 │   ├── markdown-course-converter.md # AI 課程轉 Markdown 筆記
+│   ├── markdown-course-auditor.md   # 課程講義審核校對與修訂
 │   └── archive/                     # 歷史重大版本快照 (提供離線對照)
 ├── skills/                          # AI Agent 技能 (含 SKILL.md 與輔助工具)
 ├── scripts/                         # 程式碼與自動化工具
@@ -62,6 +63,7 @@
 | `shadowing-coach` | Shadowing（跟讀）教練 | 語言學習 | Gemini Gem / 2.0 Flash | `v1.1.0` | [`prompts/shadowing-coach.md`](prompts/shadowing-coach.md) | 英文跟讀口說訓練、多益10+核心與主題延伸單字、文法深度舉一反三與發音糾錯 |
 | `toeic-golden-lecture` | TOEIC 金色證書講義生成 | 語言學習 | General / Pro | `v2.5.0` | [`prompts/toeic-golden-lecture.md`](prompts/toeic-golden-lecture.md) | 依據多益題庫與句構生成高擬真金色證書講義 |
 | `markdown-course-converter`| AI 課程轉 Markdown 筆記 | 內容轉化 | General / 1.5 Pro | `v1.0.0` | [`prompts/markdown-course-converter.md`](prompts/markdown-course-converter.md) | 將線上課程文字重組為高結構化 Markdown 筆記 |
+| `markdown-course-auditor` | 課程講義審核校對與修訂 | 內容審核 | General / 2.0 Flash | `v1.0.0` | [`prompts/markdown-course-auditor.md`](prompts/markdown-course-auditor.md) | 深度稽核講義疏漏、技術錯誤與術語規範並產出訂正改寫版 |
 
 ---
 
