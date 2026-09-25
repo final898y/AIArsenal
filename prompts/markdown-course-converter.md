@@ -1,7 +1,7 @@
 ---
 id: "markdown-course-converter"
 title: "AI 課程章節轉 Markdown 學習筆記 Prompt"
-version: "1.2.1"
+version: "1.2.3"
 type: "prompt"
 category: "education"
 tags:
@@ -57,25 +57,32 @@ Produce a complete Markdown learning note that **preserves all knowledge** while
 ## 3. 執行邏輯與規則清單 (Rules & Instructions)
 
 ### 1. 輸出必備標準 Metadata 規範 (YAML Frontmatter)
-生成的 Markdown 筆記最頂部**必須包含**標準 YAML Frontmatter，遵循第二大腦／筆記庫組織規範：
+生成的 Markdown 筆記最頂部**必須包含**標準 YAML Frontmatter，遵循結構化筆記庫組織規範：
 ```yaml
 ---
 source:
-  - "[[01_Raw/<Course_or_Chapter_Source>]]"
+  - "<Course_URL_or_Course_Name_or_File_Name>"
 created: YYYY-MM-DD
 last_edit_reason: "Initial course lecture transformation"
 tags:
-  - personal-note
-  - course-lecture
-  - draft
   - <domain-tag>
   - <topic-tag>
   - <concept-tag-1>
   - <concept-tag-2>
 ---
 ```
+**YAML 語法強制規範（YAML Syntax Enforcement）**：
+- YAML 陣列項目**必須一律使用半形連字號 `-` 作為清單標記**（如 `- tag-name`）。
+- **嚴禁使用星號 `*` 替代 `-`**。若模型預設輸出 `* tag-name` 格式，必須強制修正為 `- tag-name`，以確保 Obsidian、Jekyll 及所有 YAML 解析器的相容性。
+
+**來源欄位規範（Source Assignment Rules）**：
+- `source` 代表貼上內容的原始出處，依以下優先級填寫（**嚴禁強制寫死為 `[[01_Raw/...]]` 等內部路徑**）：
+  1. 若使用者有提供課程網址／連結，填入該完整 URL（如 `https://www.coursera.org/learn/...`）。
+  2. 若使用者有提供平台與課程／章節名稱，填入清晰名稱（如 `"Coursera - Deep Learning Specialization: Week 2"`）。
+  3. 若使用者提供的是檔案名稱，填入該原始檔名（如 `"lecture-01-attention.txt"`）。
+  4. 若使用者僅貼上文字且未附來源，請依據內容推導出的課程主題／章節名作為來源識別。
+
 **標籤分類與賦值規則（Tag Taxonomy）**：
-- **狀態標籤 (Status Tags)**：固定包含 `personal-note`、`course-lecture` 與 `draft`。
 - **領域標籤 (Domain Tag，必填 1 個)**：依據課程主要知識領域設定，使用 `kebab-case`（如：`machine-learning`、`deep-learning`、`llm`、`data-engineering`、`dev-tools`、`information-security`）。
 - **主題標籤 (Topic Tags，必填 1~2 個)**：該章節所屬子主題類別（如：`fine-tuning`、`attention`、`optimization`、`rag`、`neural-network-architecture`）。
 - **概念 / 方法標籤 (Concept / Method Tags，必填 1~4 個)**：章節中具體涉及的模型、演算法、架構或技術實體名詞（如：`transformer`、`backpropagation`、`adam-optimizer`、`lora`、`batch-normalization`）。
@@ -138,13 +145,10 @@ tags:
 ```markdown
 ---
 source:
-  - "[[01_Raw/{課程或章節來源名稱}]]"
+  - "{課程連結 URL / 課程名稱與章節 / 原始檔案名稱}"
 created: {當前日期 YYYY-MM-DD}
 last_edit_reason: "Initial course lecture transformation"
 tags:
-  - personal-note
-  - course-lecture
-  - draft
   - {domain-tag}
   - {topic-tag}
   - {concept-tag-1}
@@ -227,6 +231,8 @@ tags:
 
 | 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
 | :--- | :--- | :--- | :--- |
+| `1.2.3` | 2026-09-25 | 移除冗餘狀態標籤、強制 YAML 語法規範 | 移除無實用價值的 `personal-note`、`course-lecture`、`draft` 固定標籤；新增 YAML 陣列必須使用 `-` 而嚴禁 `*` 之語法強制規範 |
+| `1.2.2` | 2026-09-25 | 修正 source 欄位來源規範 | 修正誤植之內部路徑，改為真實素材來源格式（支援課程 URL、課程名稱與章節、原始檔案名稱） |
 | `1.2.1` | 2026-09-25 | 補強自測題與延伸問題精闢詳解 | 於講義末端規範新增「自測題與延伸問題精闢詳解」區塊，提供每題正解、解題核心思路與延伸引導，避免讀者有題目無答案 |
 | `1.2.0` | 2026-09-25 | 整合 note-organization 規範與 Metadata | 講義頂部新增標準 YAML Frontmatter（含 source, created, tags 分類法）及知識庫整合區塊（核心摘要、關鍵觀點、雙向連結、延伸問題與輸出建議） |
 | `1.1.0` | 2026-09-19 | 強化 Mermaid 與 Obsidian 規範 | 引入原生 Markdown 優先原則、限縮 Mermaid 僅用於複雜結構，並規範 \`\`\`mermaid 圍欄以支援 Obsidian |
