@@ -112,3 +112,6 @@
 ## 📄 授權與聲明
 
 本專案採用 [MIT License](LICENSE) 授權開源。歡迎自由引用、修改與分享。
+## Prompt 索引補充
+
+| `markdown-knowledge-handout-generator` | [`prompts/markdown-knowledge-handout-generator.md`](prompts/markdown-knowledge-handout-generator.md) |

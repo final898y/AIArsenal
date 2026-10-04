@@ -1,7 +1,7 @@
 ---
 id: "markdown-course-auditor"
 title: "Markdown 課程講義審核、校對與修訂改寫 Prompt"
-version: "1.1.0"
+version: "1.2.0"
 type: "prompt"
 category: "education"
 tags:
@@ -19,7 +19,7 @@ target_models:
   - "claude-3.5-sonnet"
 author: "ai-arsenal"
 created_at: "2026-09-19"
-updated_at: "2026-09-19"
+updated_at: "2026-10-04"
 variables:
   - name: "converted_notes"
     description: "待審核的 Markdown 課程筆記、講義或由 markdown-course-converter 轉換生成的內容"
@@ -175,3 +175,64 @@ summary: "深度稽核課程講義與 Markdown 筆記之內容疏漏、技術邏
 | :--- | :--- | :--- | :--- |
 | `1.1.0` | 2026-09-19 | 強化 Mermaid 與 Obsidian 規範 | 新增原生 Markdown 優先原則、限定 Mermaid 僅用於複雜結構，並強制使用 ```mermaid 圍欄以相容 Obsidian |
 | `1.0.0` | 2026-09-19 | 初版發布 | 與 `markdown-course-converter` 搭配，建立雙模態審核、六大稽核維度、三級嚴重度診斷表與完整改寫輸出規範 |
+## 7. 強制 YAML 語法與 Metadata 規範 (Mandatory YAML Syntax & Metadata Rules)
+
+Auditor 必須將 YAML Frontmatter 視為 Markdown 講義的必要結構，而不是可選的附加資訊。審核時若缺少、格式錯誤或語意不完整，必須在缺陷清單中列出，並在最終修訂版補正。
+
+### 7.1 必備 Frontmatter 結構
+
+每份修訂後的 Markdown 講義最前方必須包含 YAML Frontmatter，且必須以 `---` 開始、以另一個獨立的 `---` 結束：
+
+```yaml
+---
+source:
+  - "<Course_URL_or_Course_Name_or_File_Name>"
+created: YYYY-MM-DD
+last_edit_reason: "Audited and revised course lecture"
+tags:
+  - <domain-tag>
+  - <topic-tag>
+  - <concept-tag-1>
+  - <concept-tag-2>
+---
+```
+
+審核以下項目：
+
+- `source`、`created`、`last_edit_reason` 與 `tags` 必須存在；不可用模糊的空值或未替換的模板佔位符交付。
+- `created` 必須使用 `YYYY-MM-DD` 日期格式；不得使用不明確的日期字串。
+- `source` 必須保留可追溯來源：優先使用使用者提供的課程 URL，其次是課程／章節名稱，再其次是原始檔名。
+- 若使用者只提供文字且沒有可辨識來源，應根據內容建立清楚的主題來源名稱，並在審核報告中標示為推定來源，不得虛構 URL。
+- YAML 欄位名稱、縮排、冒號與引號必須符合合法 YAML 語法；不得混入 Tab 縮排、未關閉引號或會破壞解析的特殊字元。
+
+### 7.2 YAML 列表語法強制規範
+
+- YAML 陣列項目一律使用半形連字號 `-`，例如 `- machine-learning`。
+- **禁止使用 `*` 取代 `-`**，例如 `* machine-learning` 必須判定為 YAML 語法錯誤並修正。
+- `tags` 必須是正確縮排的 YAML 列表，不得寫成逗號分隔但未明確定義的字串。
+- Frontmatter 中的 `source` 即使只有一個來源，也必須依規範使用列表格式，避免不同 Markdown／Obsidian／Jekyll 解析器產生不一致結果。
+- 修正 YAML 時不得只修正表面縮排；必須再次檢查整個 Frontmatter 能否被一般 YAML 解析器正確讀取。
+
+### 7.3 Tags 分類與命名規範
+
+`tags` 使用小寫 `kebab-case`，並依下列分類檢查：
+
+- **Domain tag（領域標籤，1 個）**：描述主要領域，例如 `machine-learning`、`deep-learning`、`llm`、`data-engineering`、`dev-tools`、`information-security`。
+- **Topic tags（主題標籤，1–2 個）**：描述章節主題，例如 `fine-tuning`、`attention`、`optimization`、`rag`、`neural-network-architecture`。
+- **Concept／Method tags（概念／方法標籤，1–4 個）**：描述關鍵概念、方法、架構或技術，例如 `transformer`、`backpropagation`、`adam-optimizer`、`lora`、`batch-normalization`。
+
+審核時應移除重複、過度寬泛、含空格、混用大小寫或與正文無關的 tags；不得為了湊數量加入無關標籤。
+
+### 7.4 YAML 審核缺陷分級
+
+- **Critical**：Frontmatter 缺失、分隔線未閉合、YAML 無法解析，或 `source` 被改成虛構來源。
+- **Major**：缺少必要欄位、`tags` 結構錯誤、使用 `*` 代替 `-`，或日期格式不合法。
+- **Minor**：tags 命名不一致、分類數量不理想、描述文字不清楚，但不影響 YAML 解析。
+
+修訂後的完整講義必須保留合法 Frontmatter；不可只在審核報告指出問題，卻沒有在「Fully Revised & Enhanced Lecture Notes」中修正。
+
+## 8. 版本歷史補充 (Changelog Addition)
+
+| 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
+| :--- | :--- | :--- | :--- |
+| `1.2.0` | 2026-10-04 | 新增強制 YAML 語法與 Metadata 審核規範 | 參考 `markdown-course-converter.md` 的 YAML Frontmatter、來源判定、tags 分類與 `-` 列表語法要求，確保 Auditor 能檢查並修正 YAML 結構。 |
