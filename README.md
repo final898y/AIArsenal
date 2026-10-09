@@ -25,6 +25,7 @@
 ## 📖 倉庫簡介
 
 本倉庫旨在將日常開發、語言學習、內容重構與自動化流程中累積的高價值資產進行系統化管理：
+
 1. **Prompts & Gems**：經過反覆調優的高效提示詞與 Google Gemini Gem 範本。
 2. **Skills**：適用於 AI Agent（如 Antigravity / Claude Code）的自定義執行技能。
 3. **Google Apps Script**：串接 LINE、Google Workspace 等雲端自動化程式碼。
@@ -58,14 +59,14 @@
 
 ### 1. 提示詞與 Gemini Gems 庫 (Prompts)
 
-| ID | 名稱 | 類別 | 目標平台 / 模型 | 最新版本 | 檔案路徑 | 說明 |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `python-ml-tutor` | Python & ML 零基礎學習導師 | 教育 / 程式 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/python-ml-tutor.md`](prompts/python-ml-tutor.md) | 為零基礎自學者拆解 ML 程式碼與語法原理 |
-| `shadowing-coach` | Shadowing（跟讀）教練 | 語言學習 | Gemini Gem / 2.0 Flash | `v1.1.0` | [`prompts/shadowing-coach.md`](prompts/shadowing-coach.md) | 英文跟讀口說訓練、多益10+核心與主題延伸單字、文法深度舉一反三與發音糾錯 |
-| `toeic-golden-lecture` | TOEIC 金色證書講義生成 | 語言學習 | General / Pro | `v2.5.0` | [`prompts/toeic-golden-lecture.md`](prompts/toeic-golden-lecture.md) | 依據多益題庫與句構生成高擬真金色證書講義 |
-| `markdown-course-converter`| AI 課程轉 Markdown 筆記 | 內容轉化 | General / 1.5 Pro | `v1.2.4` | [`prompts/markdown-course-converter.md`](prompts/markdown-course-converter.md) | 將線上課程文字重組為高結構化、自帶 YAML Metadata 與延伸概念解析的 Markdown 筆記 |
-| `markdown-course-auditor` | 課程講義審核校對與修訂 | 內容審核 | General / 2.0 Flash | `v1.1.0` | [`prompts/markdown-course-auditor.md`](prompts/markdown-course-auditor.md) | 深度稽核講義疏漏、技術錯誤與術語規範並產出訂正改寫版 |
-| `exam-question-to-handout` | 考古題轉自足式精讀講義 | 考試 / 教育 | General / Flash & Pro | `v1.0.0` | [`prompts/exam-question-to-handout.md`](prompts/exam-question-to-handout.md) | 將題目與選項展開為免查課本之高密度 Markdown 自足式精讀講義 |
+| ID                          | 名稱                       | 類別        | 目標平台 / 模型        | 最新版本 | 檔案路徑                                                                       | 說明                                                                            |
+| :-------------------------- | :------------------------- | :---------- | :--------------------- | :------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| `python-ml-tutor`           | Python & ML 零基礎學習導師 | 教育 / 程式 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/python-ml-tutor.md`](prompts/python-ml-tutor.md)                     | 為零基礎自學者拆解 ML 程式碼與語法原理                                          |
+| `shadowing-coach`           | Shadowing（跟讀）教練      | 語言學習    | Gemini Gem / 2.0 Flash | `v1.1.0` | [`prompts/shadowing-coach.md`](prompts/shadowing-coach.md)                     | 英文跟讀口說訓練、多益10+核心與主題延伸單字、文法深度舉一反三與發音糾錯         |
+| `toeic-golden-lecture`      | TOEIC 金色證書講義生成     | 語言學習    | General / Pro          | `v2.5.0` | [`prompts/toeic-golden-lecture.md`](prompts/toeic-golden-lecture.md)           | 依據多益題庫與句構生成高擬真金色證書講義                                        |
+| `markdown-course-converter` | AI 課程轉 Markdown 筆記    | 內容轉化    | General / 1.5 Pro      | `v1.2.4` | [`prompts/markdown-course-converter.md`](prompts/markdown-course-converter.md) | 將線上課程文字重組為高結構化、自帶 YAML Metadata 與延伸概念解析的 Markdown 筆記 |
+| `markdown-course-auditor`   | 課程講義審核校對與修訂     | 內容審核    | General / 2.0 Flash    | `v1.1.0` | [`prompts/markdown-course-auditor.md`](prompts/markdown-course-auditor.md)     | 深度稽核講義疏漏、技術錯誤與術語規範並產出訂正改寫版                            |
+| `exam-question-to-handout`  | 考古題轉自足式精讀講義     | 考試 / 教育 | General / Flash & Pro  | `v1.0.0` | [`prompts/exam-question-to-handout.md`](prompts/exam-question-to-handout.md)   | 將題目與選項展開為免查課本之高密度 Markdown 自足式精讀講義                      |
 
 ---
 
@@ -73,18 +74,18 @@
 
 > 目前收錄適用於各類 Agentic AI 架構的 Skills。
 
-| Skill ID | 技能名稱 | 適用平台 | 版本 | 說明 |
-| :--- | :--- | :--- | :--- | :--- |
-| *(待擴充)* | *持續擴充中* | Antigravity / Agent | - | 歡迎新增專屬 Agent Skill |
+| Skill ID   | 技能名稱     | 適用平台            | 版本 | 說明                     |
+| :--------- | :----------- | :------------------ | :--- | :----------------------- |
+| _(待擴充)_ | _持續擴充中_ | Antigravity / Agent | -    | 歡迎新增專屬 Agent Skill |
 
 ---
 
 ### 3. Google Apps Script 自動化 (GAS)
 
-| 腳本名稱 | 類別 | 觸發模式 | 關聯服務 | 檔案路徑 |
-| :--- | :--- | :--- | :--- | :--- |
-| `line-auto-center.js` | 訊息推播 / 服務 | Webhook / DoPost | LINE Messaging API, Sheets | [`scripts/gas/line-bots/line-auto-center.js`](scripts/gas/line-bots/line-auto-center.js) |
-| `line-civil-service-account.js` | 帳務 / 業務通知 | Webhook / Trigger | LINE Messaging API | [`scripts/gas/line-bots/line-civil-service-account.js`](scripts/gas/line-bots/line-civil-service-account.js) |
+| 腳本名稱                        | 類別                     | 觸發模式              | 關聯服務                                         | 檔案路徑                                                                                                     |
+| :------------------------------ | :----------------------- | :-------------------- | :----------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| `line-auto-center.js`           | 訊息推播 / 信用卡 / 股票 | Webhook / Time-driven | LINE Messaging API, Sheets, Fugle, Yahoo Finance | [`scripts/gas/line-bots/line-auto-center.js`](scripts/gas/line-bots/line-auto-center.js)                     |
+| `line-civil-service-account.js` | 帳務 / 業務通知          | Webhook / Trigger     | LINE Messaging API                               | [`scripts/gas/line-bots/line-civil-service-account.js`](scripts/gas/line-bots/line-civil-service-account.js) |
 
 ---
 
@@ -112,6 +113,7 @@
 ## 📄 授權與聲明
 
 本專案採用 [MIT License](LICENSE) 授權開源。歡迎自由引用、修改與分享。
+
 ## Prompt 索引補充
 
 | `markdown-knowledge-handout-generator` | [`prompts/markdown-knowledge-handout-generator.md`](prompts/markdown-knowledge-handout-generator.md) |
