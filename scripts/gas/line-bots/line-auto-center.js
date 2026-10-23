@@ -1,7 +1,7 @@
 /**
  * @file line-auto-center.js
- * @description LINE 個人自動化中樞（支援台股/美股行情查詢、信用卡結帳/繳款前5天定時推播與回報、社群網址收集自動入庫 Firestore）
- * @version 1.2.0
+ * @description LINE 個人自動化中樞（支援台股/美股行情查詢、信用卡結帳與繳款日前5天至繳款日每日推播及回報、社群網址收集自動入庫 Firestore）
+ * @version 1.3.0
  * @author ai-arsenal
  * @trigger Webhook (doPost) / HTTP (doGet) / Time-driven (checkCreditCardAlerts)
  *
@@ -571,10 +571,11 @@ function checkCreditCardAlerts() {
       }
     }
 
-    // 2. 檢查繳款截止日前 5 天
+    // 2. 檢查繳款截止日前 5 天至繳款日
     if (dueDay) {
       const dueCheck = isDaysRemaining(today, dueDay, 5);
-      if (dueCheck.isMatch) {
+      // Notify every day from five days before the due date through the due date.
+      if (dueCheck.daysRemaining >= 0 && dueCheck.daysRemaining <= 5) {
         // 取得該繳款截止日所屬的週期 (YYYY-MM)
         const duePeriod = Utilities.formatDate(
           dueCheck.targetDate,
@@ -593,7 +594,7 @@ function checkCreditCardAlerts() {
           env.ALLOWED_USER,
           `💳【信用卡繳款截止提醒】\n` +
             `銀行：${bank}\n` +
-            `截止日：每月 ${dueDay} 號（倒數 5 天截止！）\n` +
+            `截止日：每月 ${dueDay} 號（剩餘 ${dueCheck.daysRemaining} 天）\n` +
             `狀態：本期尚未回報繳款\n\n` +
             `👉 若您已繳款，請在 LINE 直接回覆：\n.paid ${bank}`,
         );
@@ -643,6 +644,7 @@ function isDaysRemaining(today, targetDay, daysBefore) {
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   return {
     isMatch: diffDays === daysBefore,
+    daysRemaining: diffDays,
     targetDate: upcomingDate,
   };
 }
@@ -676,6 +678,26 @@ function markCreditCardAsPaid(bankName) {
         const dueDay = parseInt(dueRaw.replace(/\D/g, ""), 10) || 10;
         // 計算該卡即將到來的繳款日所屬週期 (YYYY-MM)
         const upcomingDueDate = getUpcomingDate(today, dueDay);
+        // If the due date has already passed, record the current month as paid
+        // instead of incorrectly assigning the payment to next month.
+        if (upcomingDueDate.getTime() > today.getTime()) {
+          const currentMonthDueDate = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            Math.min(
+              dueDay,
+              new Date(
+                today.getFullYear(),
+                today.getMonth() + 1,
+                0,
+              ).getDate(),
+            ),
+          );
+          currentMonthDueDate.setHours(0, 0, 0, 0);
+          if (currentMonthDueDate.getTime() < today.getTime()) {
+            upcomingDueDate.setTime(currentMonthDueDate.getTime());
+          }
+        }
         const period = Utilities.formatDate(
           upcomingDueDate,
           "Asia/Taipei",
@@ -700,6 +722,7 @@ function markCreditCardAsPaid(bankName) {
  *
  * | 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
  * | :--- | :--- | :--- | :--- |
+ * | `1.3.0` | 2026-10-23 | 信用卡繳款提醒改為每日通知 | 修改 checkCreditCardAlerts 於繳款日前 5 天至繳款日每日推播，並修正逾期回報繳費月份的判定 |
  * | `1.2.0` | 2026-10-02 | 信用卡排程提醒與已繳回報機制 | 實裝 checkCreditCardAlerts 每日排程（結帳日/截止日前5天主動推播）、.paid 繳費回報指令、與當期自動靜音/次月自動復原機制 |
  * | `1.1.0` | 2026-10-02 | 股票查詢分流與隨選快取升級 | 實作輸入格式分流（台股純數字/美股純英文代碼免查表），重構 lookupStockCodeByName 為 On-Demand 快取以防 100KB 上限溢位，並整合美股即時報價 |
  * | `1.0.0` | 2026-09-02 | 初版建立 | 支援 LINE Webhook、富果台股即時報價與 Firestore 社群網址入庫 |
