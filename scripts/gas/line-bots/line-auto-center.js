@@ -1,7 +1,7 @@
 /**
  * @file line-auto-center.js
  * @description LINE 個人自動化中樞（支援台股/美股行情查詢、信用卡結帳與繳款日前5天至繳款日每日推播及回報、社群網址收集自動入庫 Firestore）
- * @version 1.3.0
+ * @version 1.5.0
  * @author ai-arsenal
  * @trigger Webhook (doPost) / HTTP (doGet) / Time-driven (checkCreditCardAlerts)
  *
@@ -222,12 +222,12 @@ function handleTextMessage(replyToken, text) {
     if (result && result.success) {
       replyLineMessage(
         replyToken,
-        `✅ 已成功登記【${result.bank}】${result.period} 期信用卡已完成繳款！本期將不再發送繳款提醒。`,
+        `已成功登記【${result.bank}】${result.period} 期信用卡已完成繳款，本期將不再發送繳款提醒。`,
       );
     } else {
       replyLineMessage(
         replyToken,
-        `⚠️ 找不到【${targetBank}】的信用卡資料，請確認銀行名稱是否與試算表相符。`,
+        `找不到【${targetBank}】的信用卡資料，請確認銀行名稱是否與試算表相符。`,
       );
     }
     return;
@@ -418,6 +418,40 @@ function pushLineMessage(userId, text) {
 }
 
 /**
+ * LINE Messaging API：主動推播 Flex Message
+ * @param {string} userId LINE 使用者 ID (UID)
+ * @param {string} altText 使用者無法顯示 Flex Message 時的替代文字
+ * @param {Object} contents Flex Message bubble 或 carousel 內容
+ */
+function pushLineFlexMessage(userId, altText, contents) {
+  const env = getEnv();
+  const url = "https://api.line.me/v2/bot/message/push";
+
+  try {
+    UrlFetchApp.fetch(url, {
+      method: "post",
+      contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + env.LINE_TOKEN,
+      },
+      payload: JSON.stringify({
+        to: userId,
+        messages: [
+          {
+            type: "flex",
+            altText: altText,
+            contents: contents,
+          },
+        ],
+      }),
+      muteHttpExceptions: true,
+    });
+  } catch (e) {
+    Logger.log("LINE Flex Push Error: " + e.toString());
+  }
+}
+
+/**
  * 依股票名稱/關鍵字至 Google Sheet ("StockMap") 查詢股票代碼與市場
  * 採用「隨選即存快取 (On-Demand Cache)」機制，避免單一 Key 突破 100KB 上限
  * @param {string} query 查詢關鍵字（公司名稱、別名等）
@@ -542,8 +576,7 @@ function checkCreditCardAlerts() {
   }
 
   const rows = sheet.getDataRange().getValues();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = getTaipeiToday();
 
   for (let i = 1; i < rows.length; i++) {
     const bank = String(rows[i][0] || "").trim();
@@ -561,12 +594,85 @@ function checkCreditCardAlerts() {
     if (billDay) {
       const billCheck = isDaysRemaining(today, billDay, 5);
       if (billCheck.isMatch) {
-        pushLineMessage(
+        pushLineFlexMessage(
           env.ALLOWED_USER,
-          `📢【信用卡結帳日提醒】\n` +
-            `銀行：${bank}\n` +
-            `結帳日：每月 ${billDay} 號（倒數 5 天結帳）\n` +
-            `💡 提醒您：近期大額消費可考慮於結帳日後再刷，以享有最長免息期。`,
+          `信用卡結帳日提醒：${bank}`,
+          {
+            type: "bubble",
+            size: "kilo",
+            body: {
+              type: "box",
+              layout: "vertical",
+              spacing: "md",
+              contents: [
+                {
+                  type: "text",
+                  text: "信用卡結帳日提醒",
+                  weight: "bold",
+                  size: "lg",
+                  color: "#1F2937",
+                },
+                {
+                  type: "separator",
+                  margin: "md",
+                },
+                {
+                  type: "box",
+                  layout: "vertical",
+                  margin: "md",
+                  spacing: "sm",
+                  contents: [
+                    {
+                      type: "box",
+                      layout: "horizontal",
+                      contents: [
+                        {
+                          type: "text",
+                          text: "銀行",
+                          color: "#6B7280",
+                          flex: 1,
+                        },
+                        {
+                          type: "text",
+                          text: bank,
+                          color: "#111827",
+                          flex: 2,
+                          wrap: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: "box",
+                      layout: "horizontal",
+                      contents: [
+                        {
+                          type: "text",
+                          text: "結帳日",
+                          color: "#6B7280",
+                          flex: 1,
+                        },
+                        {
+                          type: "text",
+                          text: `每月 ${billDay} 號（倒數 5 天）`,
+                          color: "#111827",
+                          flex: 2,
+                          wrap: true,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: "text",
+                  text: "近期大額消費可考慮於結帳日後再刷，以享有較長免息期。",
+                  color: "#4B5563",
+                  size: "sm",
+                  wrap: true,
+                  margin: "md",
+                },
+              ],
+            },
+          },
         );
       }
     }
@@ -590,13 +696,121 @@ function checkCreditCardAlerts() {
         }
 
         // 發送繳款提醒，並附帶 .paid 快速回報指令提示
-        pushLineMessage(
+        pushLineFlexMessage(
           env.ALLOWED_USER,
-          `💳【信用卡繳款截止提醒】\n` +
-            `銀行：${bank}\n` +
-            `截止日：每月 ${dueDay} 號（剩餘 ${dueCheck.daysRemaining} 天）\n` +
-            `狀態：本期尚未回報繳款\n\n` +
-            `👉 若您已繳款，請在 LINE 直接回覆：\n.paid ${bank}`,
+          `信用卡繳款截止提醒：${bank}`,
+          {
+            type: "bubble",
+            size: "kilo",
+            body: {
+              type: "box",
+              layout: "vertical",
+              spacing: "md",
+              contents: [
+                {
+                  type: "text",
+                  text: "信用卡繳款截止提醒",
+                  weight: "bold",
+                  size: "lg",
+                  color: "#1F2937",
+                },
+                {
+                  type: "separator",
+                  margin: "md",
+                },
+                {
+                  type: "box",
+                  layout: "vertical",
+                  margin: "md",
+                  spacing: "sm",
+                  contents: [
+                    {
+                      type: "box",
+                      layout: "horizontal",
+                      contents: [
+                        {
+                          type: "text",
+                          text: "銀行",
+                          color: "#6B7280",
+                          flex: 1,
+                        },
+                        {
+                          type: "text",
+                          text: bank,
+                          color: "#111827",
+                          flex: 2,
+                          wrap: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: "box",
+                      layout: "horizontal",
+                      contents: [
+                        {
+                          type: "text",
+                          text: "繳款日",
+                          color: "#6B7280",
+                          flex: 1,
+                        },
+                        {
+                          type: "text",
+                          text: `每月 ${dueDay} 號（剩餘 ${dueCheck.daysRemaining} 天）`,
+                          color: "#B91C1C",
+                          flex: 2,
+                          wrap: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: "box",
+                      layout: "horizontal",
+                      contents: [
+                        {
+                          type: "text",
+                          text: "狀態",
+                          color: "#6B7280",
+                          flex: 1,
+                        },
+                        {
+                          type: "text",
+                          text: "尚未回報繳款",
+                          color: "#B91C1C",
+                          flex: 2,
+                          wrap: true,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            footer: {
+              type: "box",
+              layout: "vertical",
+              spacing: "sm",
+              contents: [
+                {
+                  type: "button",
+                  style: "primary",
+                  color: "#2563EB",
+                  action: {
+                    type: "message",
+                    label: "標記已繳費",
+                    text: `.paid ${bank}`,
+                  },
+                },
+                {
+                  type: "text",
+                  text: `也可以直接輸入：.paid ${bank}`,
+                  size: "xs",
+                  color: "#6B7280",
+                  align: "center",
+                  wrap: true,
+                },
+              ],
+            },
+          },
         );
       }
     }
@@ -605,21 +819,20 @@ function checkCreditCardAlerts() {
 
 /**
  * 輔助函式：取得從指定基準日起算，最近一個即將到來的目標日物件 (處理大小月與跨月)
- * @param {Date} baseDate 基準日期物件 (00:00:00)
+ * @param {Date} baseDate 基準日期物件（以 UTC 午夜代表台北日曆日）
  * @param {number} targetDay 目標日數字 (1~31)
  * @returns {Date} 目標日 Date 物件
  */
 function getUpcomingDate(baseDate, targetDay) {
-  const y = baseDate.getFullYear();
-  const m = baseDate.getMonth();
+  const y = baseDate.getUTCFullYear();
+  const m = baseDate.getUTCMonth();
 
   const getSafeDate = (year, month, day) => {
-    const maxDays = new Date(year, month + 1, 0).getDate();
-    return new Date(year, month, Math.min(day, maxDays));
+    const maxDays = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    return new Date(Date.UTC(year, month, Math.min(day, maxDays)));
   };
 
   const candThisMonth = getSafeDate(y, m, targetDay);
-  candThisMonth.setHours(0, 0, 0, 0);
 
   // 若本月目標日尚未過（>= 今天），即為本月；否則推算至下月
   if (candThisMonth.getTime() >= baseDate.getTime()) {
@@ -627,8 +840,22 @@ function getUpcomingDate(baseDate, targetDay) {
   }
 
   const candNextMonth = getSafeDate(y, m + 1, targetDay);
-  candNextMonth.setHours(0, 0, 0, 0);
   return candNextMonth;
+}
+
+/**
+ * 取得台北時區的今天，並以 UTC 午夜建立純日期物件。
+ * 這樣日期計算不會受到 GAS 專案時區設定影響。
+ * @returns {Date} 以 UTC 午夜代表台北今天的 Date 物件
+ */
+function getTaipeiToday() {
+  const dateText = Utilities.formatDate(
+    new Date(),
+    "Asia/Taipei",
+    "yyyy-MM-dd",
+  );
+  const parts = dateText.split("-").map(Number);
+  return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
 }
 
 /**
@@ -636,7 +863,7 @@ function getUpcomingDate(baseDate, targetDay) {
  * @param {Date} today 今日日期物件 (00:00:00)
  * @param {number} targetDay 目標日數字 (1~31)
  * @param {number} daysBefore 倒數天數 (例如 5)
- * @returns {{ isMatch: boolean, targetDate: Date }}
+ * @returns {{ isMatch: boolean, daysRemaining: number, targetDate: Date }}
  */
 function isDaysRemaining(today, targetDay, daysBefore) {
   const upcomingDate = getUpcomingDate(today, targetDay);
@@ -661,8 +888,7 @@ function markCreditCardAsPaid(bankName) {
     if (!sheet) return null;
 
     const values = sheet.getDataRange().getValues();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getTaipeiToday();
     const cleanTarget = bankName.trim().toLowerCase();
 
     for (let i = 1; i < values.length; i++) {
@@ -682,18 +908,21 @@ function markCreditCardAsPaid(bankName) {
         // instead of incorrectly assigning the payment to next month.
         if (upcomingDueDate.getTime() > today.getTime()) {
           const currentMonthDueDate = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            Math.min(
-              dueDay,
-              new Date(
-                today.getFullYear(),
-                today.getMonth() + 1,
-                0,
-              ).getDate(),
+            Date.UTC(
+              today.getUTCFullYear(),
+              today.getUTCMonth(),
+              Math.min(
+                dueDay,
+                new Date(
+                  Date.UTC(
+                    today.getUTCFullYear(),
+                    today.getUTCMonth() + 1,
+                    0,
+                  ),
+                ).getUTCDate(),
+              ),
             ),
           );
-          currentMonthDueDate.setHours(0, 0, 0, 0);
           if (currentMonthDueDate.getTime() < today.getTime()) {
             upcomingDueDate.setTime(currentMonthDueDate.getTime());
           }
@@ -722,6 +951,8 @@ function markCreditCardAsPaid(bankName) {
  *
  * | 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
  * | :--- | :--- | :--- | :--- |
+ * | `1.5.0` | 2026-10-23 | 修正信用卡日期與繳費月份時區處理 | 統一使用台北日曆日期計算，避免 GAS 專案時區造成跨日或跨月誤判 |
+ * | `1.4.0` | 2026-10-23 | 信用卡提醒改用 Flex Message | 移除提醒中的表情符號，加入繳費按鈕並保留 .paid 手動回報方式 |
  * | `1.3.0` | 2026-10-23 | 信用卡繳款提醒改為每日通知 | 修改 checkCreditCardAlerts 於繳款日前 5 天至繳款日每日推播，並修正逾期回報繳費月份的判定 |
  * | `1.2.0` | 2026-10-02 | 信用卡排程提醒與已繳回報機制 | 實裝 checkCreditCardAlerts 每日排程（結帳日/截止日前5天主動推播）、.paid 繳費回報指令、與當期自動靜音/次月自動復原機制 |
  * | `1.1.0` | 2026-10-02 | 股票查詢分流與隨選快取升級 | 實作輸入格式分流（台股純數字/美股純英文代碼免查表），重構 lookupStockCodeByName 為 On-Demand 快取以防 100KB 上限溢位，並整合美股即時報價 |
