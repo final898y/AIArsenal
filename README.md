@@ -85,7 +85,7 @@
 | 腳本名稱                        | 類別                     | 觸發模式              | 關聯服務                                         | 檔案路徑                                                                                                     |
 | :------------------------------ | :----------------------- | :-------------------- | :----------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
 | `line-auto-center.js`           | 訊息推播 / 信用卡 / 股票 | Webhook / Time-driven | LINE Messaging API, Sheets, Fugle, Yahoo Finance | [`scripts/gas/line-bots/line-auto-center.js`](scripts/gas/line-bots/line-auto-center.js)                     |
-| `line-civil-service-account.js` | 帳務 / 業務通知          | Webhook / Trigger     | LINE Messaging API                               | [`scripts/gas/line-bots/line-civil-service-account.js`](scripts/gas/line-bots/line-civil-service-account.js) |
+| `line-civil-service-account.js` | 業務服務 / 路燈檢索      | Webhook / Trigger     | LINE Messaging API, Google Sheets                | [`scripts/gas/line-bots/line-civil-service-account.js`](scripts/gas/line-bots/line-civil-service-account.js) |
 
 ---
 
