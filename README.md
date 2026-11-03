@@ -2,7 +2,7 @@
 
 > 個人專屬的 AI 智慧中樞與自動化工具庫：收錄 **Gemini Gems**、**精選 Prompts**、**Agent Skills** 與 **Google Apps Script (GAS)** 自動化腳本。
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](AGENTS.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](AGENTS.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#)
 [![Maintenance](https://img.shields.io/badge/maintained%3F-yes-brightgreen.svg)](#)
 
@@ -45,6 +45,8 @@
 │   ├── exam-question-to-handout.md  # 考古題轉自足式精讀講義
 │   └── archive/                     # 歷史重大版本快照 (提供離線對照)
 ├── skills/                          # AI Agent 技能 (含 SKILL.md 與輔助工具)
+│   ├── convert-course-to-markdown/  # AI 課程轉 Markdown 筆記 Skill
+│   └── audit-course-markdown/       # 課程講義審核校對與修訂 Skill
 ├── scripts/                         # 程式碼與自動化工具
 │   └── gas/                         # Google Apps Script 專案
 │       ├── line-bots/               # LINE 訊息整合與自動化服務
@@ -74,9 +76,10 @@
 
 > 目前收錄適用於各類 Agentic AI 架構的 Skills。
 
-| Skill ID   | 技能名稱     | 適用平台            | 版本 | 說明                     |
-| :--------- | :----------- | :------------------ | :--- | :----------------------- |
-| _(待擴充)_ | _持續擴充中_ | Antigravity / Agent | -    | 歡迎新增專屬 Agent Skill |
+| Skill ID                    | 技能名稱                              | 適用平台                       | 版本     | 檔案路徑                                                                                   | 說明                                                                            |
+| :-------------------------- | :------------------------------------ | :----------------------------- | :------- | :----------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| `convert-course-to-markdown` | AI 課程章節轉 Markdown 學習筆記       | General / Gemini / Antigravity | `v1.0.0` | [`skills/convert-course-to-markdown/SKILL.md`](skills/convert-course-to-markdown/SKILL.md) | 將線上課程文字重組為高結構化、自帶標準 YAML Metadata 與自測題詳解的 Markdown 筆記 |
+| `audit-course-markdown`      | Markdown 課程講義審核、校對與修訂改寫 | General / Gemini / Antigravity | `v1.0.0` | [`skills/audit-course-markdown/SKILL.md`](skills/audit-course-markdown/SKILL.md)         | 深度稽核講義疏漏、技術錯誤、YAML 規範並產出訂正改寫版                            |
 
 ---
 
