@@ -46,7 +46,8 @@
 │   └── archive/                     # 歷史重大版本快照 (提供離線對照)
 ├── skills/                          # AI Agent 技能 (含 SKILL.md 與輔助工具)
 │   ├── convert-course-to-markdown/  # AI 課程轉 Markdown 筆記 Skill
-│   └── audit-course-markdown/       # 課程講義審核校對與修訂 Skill
+│   ├── audit-course-markdown/       # 課程講義審核校對與修訂 Skill
+│   └── draft-government-memo/       # 公文簽呈與便簽生成 Skill (含 examples/ 範例庫)
 ├── scripts/                         # 程式碼與自動化工具
 │   └── gas/                         # Google Apps Script 專案
 │       ├── line-bots/               # LINE 訊息整合與自動化服務
@@ -80,6 +81,7 @@
 | :-------------------------- | :------------------------------------ | :----------------------------- | :------- | :----------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
 | `convert-course-to-markdown` | AI 課程章節轉 Markdown 學習筆記       | General / Gemini / Antigravity | `v1.0.0` | [`skills/convert-course-to-markdown/SKILL.md`](skills/convert-course-to-markdown/SKILL.md) | 將線上課程文字重組為高結構化、自帶標準 YAML Metadata 與自測題詳解的 Markdown 筆記 |
 | `audit-course-markdown`      | Markdown 課程講義審核、校對與修訂改寫 | General / Gemini / Antigravity | `v1.0.0` | [`skills/audit-course-markdown/SKILL.md`](skills/audit-course-markdown/SKILL.md)         | 深度稽核講義疏漏、技術錯誤、YAML 規範並產出訂正改寫版                            |
+| `draft-government-memo`     | 公文簽呈與便簽生成                    | General / Gemini / Antigravity | `v1.0.0` | [`skills/draft-government-memo/SKILL.md`](skills/draft-government-memo/SKILL.md)         | 依來函自動生成簽或便簽草稿，支援派員參訓表單與模組化範例庫 (examples/)           |
 
 ---
 
