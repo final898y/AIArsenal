@@ -47,7 +47,8 @@
 ├── skills/                          # AI Agent 技能 (含 SKILL.md 與輔助工具)
 │   ├── convert-course-to-markdown/  # AI 課程轉 Markdown 筆記 Skill
 │   ├── audit-course-markdown/       # 課程講義審核校對與修訂 Skill
-│   └── draft-government-memo/       # 公文簽呈與便簽生成 Skill (含 examples/ 範例庫)
+│   ├── draft-government-memo/       # 公文簽呈與便簽生成 Skill (含 examples/ 範例庫)
+│   └── generate-toeic-lecture/      # TOEIC 金色證書講義生成與跟讀訓練 Skill
 ├── scripts/                         # 程式碼與自動化工具
 │   └── gas/                         # Google Apps Script 專案
 │       ├── line-bots/               # LINE 訊息整合與自動化服務
@@ -66,7 +67,7 @@
 | :-------------------------- | :------------------------- | :---------- | :--------------------- | :------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
 | `python-ml-tutor`           | Python & ML 零基礎學習導師 | 教育 / 程式 | Gemini Gem / 2.0 Flash | `v1.0.0` | [`prompts/python-ml-tutor.md`](prompts/python-ml-tutor.md)                     | 為零基礎自學者拆解 ML 程式碼與語法原理                                          |
 | `shadowing-coach`           | Shadowing（跟讀）教練      | 語言學習    | Gemini Gem / 2.0 Flash | `v1.1.0` | [`prompts/shadowing-coach.md`](prompts/shadowing-coach.md)                     | 英文跟讀口說訓練、多益10+核心與主題延伸單字、文法深度舉一反三與發音糾錯         |
-| `toeic-golden-lecture`      | TOEIC 金色證書講義生成     | 語言學習    | General / Pro          | `v2.5.0` | [`prompts/toeic-golden-lecture.md`](prompts/toeic-golden-lecture.md)           | 依據多益題庫與句構生成高擬真金色證書講義                                        |
+| `toeic-golden-lecture`      | TOEIC 金色證書講義生成     | 語言學習    | General / Pro          | `v2.6.0` | [`prompts/toeic-golden-lecture.md`](prompts/toeic-golden-lecture.md)           | 依據真實語料生成高擬真金色證書講義、詞彙語塊、連讀語流與跟讀強化               |
 | `markdown-course-converter` | AI 課程轉 Markdown 筆記    | 內容轉化    | General / 1.5 Pro      | `v1.2.4` | [`prompts/markdown-course-converter.md`](prompts/markdown-course-converter.md) | 將線上課程文字重組為高結構化、自帶 YAML Metadata 與延伸概念解析的 Markdown 筆記 |
 | `markdown-course-auditor`   | 課程講義審核校對與修訂     | 內容審核    | General / 2.0 Flash    | `v1.1.0` | [`prompts/markdown-course-auditor.md`](prompts/markdown-course-auditor.md)     | 深度稽核講義疏漏、技術錯誤與術語規範並產出訂正改寫版                            |
 | `exam-question-to-handout`  | 考古題轉自足式精讀講義     | 考試 / 教育 | General / Flash & Pro  | `v1.0.0` | [`prompts/exam-question-to-handout.md`](prompts/exam-question-to-handout.md)   | 將題目與選項展開為免查課本之高密度 Markdown 自足式精讀講義                      |
@@ -82,6 +83,7 @@
 | `convert-course-to-markdown` | AI 課程章節轉 Markdown 學習筆記       | General / Gemini / Antigravity | `v1.0.0` | [`skills/convert-course-to-markdown/SKILL.md`](skills/convert-course-to-markdown/SKILL.md) | 將線上課程文字重組為高結構化、自帶標準 YAML Metadata 與自測題詳解的 Markdown 筆記 |
 | `audit-course-markdown`      | Markdown 課程講義審核、校對與修訂改寫 | General / Gemini / Antigravity | `v1.0.0` | [`skills/audit-course-markdown/SKILL.md`](skills/audit-course-markdown/SKILL.md)         | 深度稽核講義疏漏、技術錯誤、YAML 規範並產出訂正改寫版                            |
 | `draft-government-memo`     | 公文簽呈與便簽生成                    | General / Gemini / Antigravity | `v1.0.0` | [`skills/draft-government-memo/SKILL.md`](skills/draft-government-memo/SKILL.md)         | 依來函自動生成簽或便簽草稿，支援派員參訓表單與模組化範例庫 (examples/)           |
+| `generate-toeic-lecture`    | TOEIC 金色證書講義生成與跟讀訓練      | General / Gemini / Antigravity | `v1.0.0` | [`skills/generate-toeic-lecture/SKILL.md`](skills/generate-toeic-lecture/SKILL.md)         | 依據真實語料生成 9 大模組之金色證書講義，強化詞彙語塊、連讀發音與視覺跟讀譜     |
 
 ---
 
