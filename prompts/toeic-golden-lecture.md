@@ -1,7 +1,7 @@
 ---
 id: "toeic-golden-lecture"
 title: "TOEIC 金色證書講義生成 Prompt"
-version: "2.6.0"
+version: "2.7.0"
 type: "prompt"
 category: "language"
 tags:
@@ -13,6 +13,8 @@ tags:
   - shadowing
   - connected-speech
   - lexical-chunks
+  - yaml-frontmatter
+  - self-audit
 target_platform: "general"
 target_models:
   - "gemini-2.0-flash"
@@ -20,18 +22,19 @@ target_models:
   - "claude-3.5-sonnet"
 author: "ai-arsenal"
 created_at: "2026-09-02"
-updated_at: "2026-11-08"
+updated_at: "2026-11-11"
 variables:
   - name: "raw_material"
     description: "真實英文素材（逐字稿 / 商業文章 / 技術文件 / 書籍段落）"
     required: true
-summary: "將任意真實英文素材轉化為極高學習密度的 TOEIC 金色證書講義，涵蓋詞彙語塊、連讀語音解析、Shadowing 跟讀引導、字族擴展、文法分析與 Part 5/6/7 擬真試題。"
+summary: "將任意真實英文素材轉化為自帶標準 YAML 表頭的極高學習密度 TOEIC 金色證書講義，涵蓋詞彙語塊、連讀語音解析、Shadowing 跟讀引導、字族擴展、文法分析與 Part 5/6/7 擬真試題。"
 ---
 
-# TOEIC 金色證書講義生成 Prompt — V2.6（Shadowing 語流與學習密度最佳化版）
+# TOEIC 金色證書講義生成 Prompt — V2.7（標準 YAML 表頭與語流強化版）
 
 > **摘要與用途說明**
-> 本 Prompt 用於將真實世界中的英文內容（新聞、訪談逐字稿、商業文件等）自動提煉轉化為 TOEIC 860+ 金色證書等級的高密度學習講義，涵蓋詞彙語塊、連音語流拆解、跟讀（Shadowing）指導、字族擴展、考點分析與模擬出題。
+> 本 Prompt 用於將真實世界中的英文內容（新聞、訪談逐字稿、商業文件等）自動提煉轉化為 TOEIC 860+ 金色證書等級的高密度學習講義。
+> 講義頂部**強制輸出標準 YAML Frontmatter 表頭**以利知識管理，內容涵蓋詞彙語塊、連音語流拆解、跟讀（Shadowing）指導、字族擴展、考點分析與模擬出題。
 
 ---
 
@@ -56,9 +59,31 @@ summary: "將任意真實英文素材轉化為極高學習密度的 TOEIC 金色
 
 ---
 
-## 4. 執行邏輯與標準輸出章節 (Rules & Output Structure)
+## 4. 講義頂部標準 YAML Frontmatter 表頭規範
 
-請依照以下 9 個結構化模組產出講義：
+輸出的講義開頭**必須包含標準 YAML Frontmatter 區塊**，格式如下：
+
+```yaml
+---
+title: "TOEIC 金色證書精讀講義：[精煉繁體中文標題，含核心主題或主角]"
+source: "[原始影音/文章標題、媒體名稱或來源 URL]"
+published: YYYY-MM-DD # 原文發布日期（若素材未提及則填寫推估日期或 null）
+created: YYYY-MM-DD   # 講義產出日期
+last_edit_reason: "初始生成講義與 Shadowing 語流解析"
+tags:
+  - TOEIC
+  - English-learning
+  - business-English
+  - [主題領域標籤]
+  - [關鍵實體標籤]
+---
+```
+
+---
+
+## 5. 執行邏輯與標準輸出章節 (Rules & Output Structure)
+
+請在 YAML 表頭後，依照以下 9 個結構化模組產出講義：
 
 ### 第一部分：原文保留（重要）
 - 完整保留原始英文內容。
@@ -129,10 +154,11 @@ summary: "將任意真實英文素材轉化為極高學習密度的 TOEIC 金色
 
 ---
 
-## 5. 版本歷史與變更記錄 (Changelog & Diff History)
+## 6. 版本歷史與變更記錄 (Changelog & Diff History)
 
 | 版本 | 日期 | 修改重點 | 調整動機 / 對照說明 |
 | :--- | :--- | :--- | :--- |
+| `2.7.0` | 2026-11-11 | 增列講義標準 YAML Frontmatter 表頭 | 強制要求講義輸出頂部包含 title, source, published, created, last_edit_reason, tags 等中繼資訊 |
 | `2.6.0` | 2026-11-08 | 新增詞彙語塊與語流連讀模組 | 在核心單字後導入 Lexical Chunks 與 Connected Speech（連音、弱讀、消音、閃音與跟讀視覺標記），大幅強化 Shadowing 與聽力敏銳度 |
 | `2.5.0` | 2026-09-02 | 整合至 ai-arsenal 庫 | 補齊標準 YAML Frontmatter 與結構規範 |
 | `2.0.0` | 2026-08-15 | 擴增字族與擬真題型 | 增加 Part 5/6/7 題型生成與詳細干擾項解析 |
