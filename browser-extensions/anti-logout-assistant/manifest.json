@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "防登出雙模式助手 (e等公務園 / 一般網頁)",
+  "version": "2.2.0",
+  "description": "支援 e等公務園專用背景維持（Session 探測、防誤點閒置提醒自動關閉、原生跨框架穿透）與一般網頁定時重整之雙模式連線助手。",
+  "permissions": ["alarms", "storage", "tabs", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "設定防登出模式"
+  }
+}

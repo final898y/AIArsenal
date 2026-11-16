@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        width: 260px;
+        padding: 14px;
+        font-family: "Microsoft JhengHei", sans-serif;
+        margin: 0;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      h3 {
+        margin: 0 0 10px 0;
+        font-size: 15px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 6px;
+        color: #1a73e8;
+      }
+      .option-group {
+        margin-bottom: 12px;
+        background: #fff;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      label:last-child {
+        margin-bottom: 0;
+      }
+      .desc {
+        display: block;
+        font-size: 11px;
+        color: #666;
+        margin-left: 20px;
+        margin-top: 2px;
+      }
+      .interval-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      input[type="number"] {
+        width: 60px;
+        padding: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: center;
+      }
+      button {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        border-radius: 5px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-start {
+        background-color: #28a745;
+        color: white;
+      }
+      .btn-start:hover {
+        background-color: #218838;
+      }
+      .btn-stop {
+        background-color: #dc3545;
+        color: white;
+      }
+      .btn-stop:hover {
+        background-color: #c82333;
+      }
+      .btn-test {
+        background-color: #f1f3f4;
+        color: #1a73e8;
+        border: 1px solid #dadce0;
+        margin-top: 8px;
+      }
+      .btn-test:hover {
+        background-color: #e8eaed;
+      }
+      .status {
+        margin-top: 8px;
+        font-size: 12px;
+        text-align: center;
+        color: #555;
+      }
+      .test-result {
+        margin-top: 6px;
+        font-size: 11px;
+        text-align: center;
+        min-height: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>防登出模式設定</h3>
+
+    <div class="option-group">
+      <label>
+        <input type="radio" name="mode" value="elearn" checked />
+        <strong>e等公務園專用模式</strong>
+        <span class="desc"
+          >背景呼叫 /online/online.php，不重整畫面、不中斷影片</span
+        >
+      </label>
+      <label>
+        <input type="radio" name="mode" value="reload" />
+        <strong>一般網頁重整模式</strong>
+        <span class="desc">定時整頁重新整理 (Reload)，強制維持連線</span>
+      </label>
+    </div>
+
+    <div class="interval-box">
+      <span>執行間隔（分鐘）：</span>
+      <input type="number" id="interval" value="15" min="1" max="120" />
+    </div>
+
+    <button id="toggleBtn" class="btn-start">啟動防登出</button>
+    <button id="testBtn" class="btn-test">立即測試一次</button>
+
+    <div class="status" id="statusText">目前狀態：未啟動</div>
+    <div class="test-result" id="testResult"></div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

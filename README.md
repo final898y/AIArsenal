@@ -1,8 +1,8 @@
-# 🧰 AI Arsenal & Knowledge Vault
+﻿# 🧰 AI Arsenal & Knowledge Vault
 
-> 個人專屬的 AI 智慧中樞與自動化工具庫：收錄 **Gemini Gems**、**精選 Prompts**、**Agent Skills** 與 **Google Apps Script (GAS)** 自動化腳本。
+> 個人專屬的 AI 智慧中樞與自動化工具庫：收錄 **Gemini Gems**、**精選 Prompts**、**Agent Skills**、**Google Apps Script (GAS)** 自動化腳本與**瀏覽器擴充套件 (Chrome Extensions)**。
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](AGENTS.md)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](AGENTS.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#)
 [![Maintenance](https://img.shields.io/badge/maintained%3F-yes-brightgreen.svg)](#)
 
@@ -16,6 +16,7 @@
   - [1. Gemini Gems & 提示詞庫 (Prompts)](#1-gemini-gems--提示詞庫-prompts)
   - [2. Agent 技能組 (Skills)](#2-agent-技能組-skills)
   - [3. Google Apps Script 自動化 (GAS)](#3-google-apps-script-自動化-gas)
+  - [4. 瀏覽器擴充套件 (Browser Extensions)](#4-瀏覽器擴充套件-browser-extensions)
 - [版本管理與比對機制](#-版本管理與比對機制)
 - [規格與維護規範 (AGENTS.md)](#-規格與維護規範)
 - [授權與聲明](#-授權與聲明)
@@ -29,6 +30,7 @@
 1. **Prompts & Gems**：經過反覆調優的高效提示詞與 Google Gemini Gem 範本。
 2. **Skills**：適用於 AI Agent（如 Antigravity / Claude Code）的自定義執行技能。
 3. **Google Apps Script**：串接 LINE、Google Workspace 等雲端自動化程式碼。
+4. **Browser Extensions**：適用於 Google Chrome (Manifest V3) 的自製輕量擴充套件。
 
 ---
 
@@ -36,6 +38,10 @@
 
 ```text
 .
+├── browser-extensions/              # 瀏覽器擴充套件 (Chrome MV3)
+│   ├── cambridge-dictionary-lookup/ # 劍橋雙解詞典快速查詢套件
+│   ├── anti-logout-assistant/       # 防登出雙模式助手 (e等公務園 / 一般網頁)
+│   └── README.md                    # 擴充套件庫總覽說明
 ├── prompts/                         # 提示詞庫與 Gemini Gems (統一收錄)
 │   ├── python-ml-tutor.md           # Python & ML 零基礎學習導師
 │   ├── shadowing-coach.md           # Shadowing（跟讀）教練
@@ -43,6 +49,7 @@
 │   ├── markdown-course-converter.md # AI 課程轉 Markdown 筆記
 │   ├── markdown-course-auditor.md   # 課程講義審核校對與修訂
 │   ├── exam-question-to-handout.md  # 考古題轉自足式精讀講義
+│   ├── markdown-knowledge-handout-generator.md # Markdown 知識講義自動生成
 │   └── archive/                     # 歷史重大版本快照 (提供離線對照)
 ├── skills/                          # AI Agent 技能 (含 SKILL.md 與輔助工具)
 │   ├── convert-course-to-markdown/  # AI 課程轉 Markdown 筆記 Skill
@@ -72,6 +79,7 @@
 | `markdown-course-converter` | AI 課程轉 Markdown 筆記    | 內容轉化    | General / 1.5 Pro      | `v1.2.4` | [`prompts/markdown-course-converter.md`](prompts/markdown-course-converter.md) | 將線上課程文字重組為高結構化、自帶 YAML Metadata 與延伸概念解析的 Markdown 筆記 |
 | `markdown-course-auditor`   | 課程講義審核校對與修訂     | 內容審核    | General / 2.0 Flash    | `v1.1.0` | [`prompts/markdown-course-auditor.md`](prompts/markdown-course-auditor.md)     | 深度稽核講義疏漏、技術錯誤與術語規範並產出訂正改寫版                            |
 | `exam-question-to-handout`  | 考古題轉自足式精讀講義     | 考試 / 教育 | General / Flash & Pro  | `v1.0.0` | [`prompts/exam-question-to-handout.md`](prompts/exam-question-to-handout.md)   | 將題目與選項展開為免查課本之高密度 Markdown 自足式精讀講義                      |
+| `markdown-knowledge-handout-generator` | Markdown 知識講義自動生成 | 教育 / 自學 | General / Flash & Pro | `v1.0.0` | [`prompts/markdown-knowledge-handout-generator.md`](prompts/markdown-knowledge-handout-generator.md) | 將日常問題或文章摘錄自動轉化為結構化自足式知識精讀講義 |
 
 ---
 
@@ -95,6 +103,15 @@
 | :------------------------------ | :----------------------- | :-------------------- | :----------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
 | `line-auto-center.js`           | 訊息推播 / 信用卡 / 股票 | Webhook / Time-driven | LINE Messaging API, Sheets, Fugle, Yahoo Finance | [`scripts/gas/line-bots/line-auto-center.js`](scripts/gas/line-bots/line-auto-center.js)                     |
 | `line-civil-service-account.js` | 業務服務 / 路燈檢索      | Webhook / Trigger     | LINE Messaging API, Google Sheets                | [`scripts/gas/line-bots/line-civil-service-account.js`](scripts/gas/line-bots/line-civil-service-account.js) |
+
+---
+
+### 4. 瀏覽器擴充套件 (Browser Extensions)
+
+| 套件 ID | 套件名稱 | 類別 | 架構 / 模式 | 最新版本 | 檔案路徑 | 說明 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `cambridge-dictionary-lookup` | 劍橋雙解詞典快速查詢 | 語言學習 / 閱讀輔助 | Chrome MV3 (Context Menu) | `v1.0.0` | [`browser-extensions/cambridge-dictionary-lookup/`](browser-extensions/cambridge-dictionary-lookup/README.md) | 選取網頁文字後透過右鍵選單，快速直達劍橋官方繁體中文雙解詞典查詢釋義與例句。 |
+| `anti-logout-assistant` | 防登出雙模式助手 | 工作生產力 / 連線維持 | Chrome MV3 (Alarms + Scripting) | `v2.2.0` | [`browser-extensions/anti-logout-assistant/`](browser-extensions/anti-logout-assistant/README.md) | 支援 e等公務園背景維持（Session 探測、防誤點閒置提醒自動關閉、跨框架穿透）與一般網頁定時重整之雙模式工具。 |
 
 ---
 
@@ -122,7 +139,3 @@
 ## 📄 授權與聲明
 
 本專案採用 [MIT License](LICENSE) 授權開源。歡迎自由引用、修改與分享。
-
-## Prompt 索引補充
-
-| `markdown-knowledge-handout-generator` | [`prompts/markdown-knowledge-handout-generator.md`](prompts/markdown-knowledge-handout-generator.md) |

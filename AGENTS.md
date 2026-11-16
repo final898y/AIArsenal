@@ -9,6 +9,9 @@
 倉庫採用分類分層管理，結構如下：
 
 ```text
+├── browser-extensions/           # 瀏覽器擴充套件 (Chrome Extensions Manifest V3)
+│   ├── <extension-id>/           # 獨立套件資料夾 (含 manifest.json、代碼與 README.md)
+│   └── README.md                 # 擴充套件庫總覽與索引
 ├── prompts/                      # 存放各類通用 Prompt / Gemini Gems
 │   ├── <prompt-id>.md            # 各別 Prompt 檔案
 │   └── archive/                  # 重大歷史版本快照
@@ -126,9 +129,22 @@ Prompt 與 Skill 隨著模型升級或需求微調會頻繁迭代，為了能快
 
 ---
 
-## 5. AI Agent 操作行為準則
+## 5. 瀏覽器擴充套件 (Browser Extensions) 規範
+
+1. **架構標準**：全面採用 Chrome Extension Manifest V3 規範，使用 Service Worker (`background.js`) 作為背景處理常式。
+2. **目錄與命名**：資料夾採用 `kebab-case`（例如 `cambridge-dictionary-lookup`、`anti-logout-assistant`），不加入贅詞如 `-extension`。
+3. **版本控管 (SemVer)**：`manifest.json` 之 `version` 與套件 `README.md` 必須嚴格保持一致的三碼語意化版本（例如 `1.0.0`、`2.0.0`）。
+4. **必備說明文件**：每個套件目錄內均須包含 `README.md`，配備標準 YAML Frontmatter，並詳細記錄功能、安裝指南、權限聲明與版本日誌。
+5. **資源與安全性原則**：
+   - 遵循最小權限原則 (Principle of Least Privilege)。
+   - 嚴禁硬編碼敏感金鑰、Token 或個人身分資料。
+   - 涉及定時鬧鐘 (`chrome.alarms`) 或分頁監聽時，必須包含分頁關閉之資源清理邏輯 (`chrome.tabs.onRemoved`)，避免記憶體洩漏。
+
+---
+
+## 6. AI Agent 操作行為準則
 
 當 AI Agent 在本倉庫執行操作時：
-1. **建立新檔案**：必須主動產出標準 Frontmatter、填入正確分類，並在 `README.md` 的索引表中登記。
+1. **建立新檔案**：必須主動產出標準 Frontmatter、填入正確分類，並在 `README.md` 的索引表中登記。若為新擴充套件，須建立獨立目錄與專屬 `README.md`。
 2. **更新現有檔案**：必須升級 `version`、更新 `updated_at`、並在文末 `Changelog` 增加紀錄。
-3. **搬移或重新命名**：須同步更新 `README.md` 中的所有超連結。
+3. **搬移或重新命名**：須同步更新 `README.md` 與所有關聯檔案中的超連結。

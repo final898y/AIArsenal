@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "劍橋雙解詞典快速查詢",
+  "version": "1.0.0",
+  "description": "選取網頁單字後點擊滑鼠右鍵選單，快速跳轉至劍橋雙解詞典（繁體中文版）查詢釋義。",
+  "permissions": ["contextMenus", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
