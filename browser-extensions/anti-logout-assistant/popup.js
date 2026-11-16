@@ -2,8 +2,8 @@
  * 防登出雙模式助手 (Dual-Mode Anti-Logout Assistant)
  *
  * @description 彈出視窗介面控制邏輯 (Popup Controller)
- * 負責設定模式切換、間隔分鐘調整、即時連線與防閒置彈窗診斷測試、鬧鐘啟動/停止狀態顯示。
- * @version 2.2.0
+ * 負責設定模式切換、間隔分鐘調整、即時連線與防閒置彈窗診斷測試、鬧鐘啟動/停止狀態顯示與 0秒監聽器掛載。
+ * @version 2.3.0
  * @author AIArsenal
  */
 
@@ -128,7 +128,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const text = (el.textContent || el.value || "").trim();
                 if (!text) continue;
 
-                // 排除危險關鍵字
                 if (dangerKeywords.some((d) => text.includes(d))) continue;
 
                 const isMatch = safeKeywords.some(
@@ -233,6 +232,100 @@ document.addEventListener("DOMContentLoaded", async () => {
         tabId: tabId,
         color: badgeColor,
       });
+
+      // 若為 e等公務園模式，啟動當下立刻向當前分頁（全框架）掛載 0秒 MutationObserver 監聽器
+      if (selectedMode === "elearn") {
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tabId, allFrames: true },
+            func: () => {
+              if (window.__ANTI_LOGOUT_OBSERVER_ACTIVE__) return;
+              window.__ANTI_LOGOUT_OBSERVER_ACTIVE__ = true;
+
+              const isTop = window === window.top;
+              const frameLabel = isTop ? "頂層框架" : `子框架 (${window.location.pathname})`;
+              let lastClickTime = 0;
+
+              const safeKeywords = ["確定", "繼續", "延長", "知道了", "繼續上課", "延長連線", "確定延長"];
+              const dangerKeywords = ["登出", "交卷", "送出", "刪除", "放棄", "取消", "離開", "結束"];
+
+              const isElementVisible = (el) => {
+                if (!el) return false;
+                const style = window.getComputedStyle(el);
+                if (style.display === "none" || style.visibility === "hidden" || style.opacity === "0") {
+                  return false;
+                }
+                const rect = el.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+              };
+
+              const scanAndDismiss = () => {
+                if (Date.now() - lastClickTime < 1000) return;
+                try {
+                  const pageText = document.body ? document.body.innerText : "";
+                  const pageHasIdleAlert = /閒置|逾時|尚未操作|連線中斷|即將登出|自動登出|延長學習/.test(pageText);
+
+                  const clickableElements = document.querySelectorAll(
+                    'button, input[type="button"], input[type="submit"], a, div[role="button"]'
+                  );
+
+                  for (const el of clickableElements) {
+                    if (!isElementVisible(el)) continue;
+
+                    const text = (el.textContent || el.value || "").trim();
+                    if (!text) continue;
+
+                    if (dangerKeywords.some((d) => text.includes(d))) continue;
+
+                    const isMatch = safeKeywords.some((kw) => text === kw || text.includes(kw));
+                    if (isMatch) {
+                      const isInModal = !!el.closest(
+                        '.modal, .dialog, [role="dialog"], [role="alertdialog"], .alert, .swal2-container, .layui-layer, .fancybox-wrap, #idleDialog'
+                      );
+
+                      if (isInModal || pageHasIdleAlert) {
+                        el.click();
+                        lastClickTime = Date.now();
+                        console.log(
+                          `%c[防登出助手 ⚡ 即時攔截]%c [${new Date().toLocaleTimeString()}] [${frameLabel}] 偵測到閒置彈窗，0 秒自動點擊確認按鈕：「${text}」`,
+                          "background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;",
+                          "color: auto;"
+                        );
+
+                        try {
+                          ["mousemove", "keydown", "scroll"].forEach((evtName) => {
+                            window.dispatchEvent(new Event(evtName, { bubbles: true }));
+                            document.dispatchEvent(new Event(evtName, { bubbles: true }));
+                          });
+                        } catch (e) {}
+                        break;
+                      }
+                    }
+                  }
+                } catch (e) {}
+              };
+
+              scanAndDismiss();
+
+              let debounceTimer = null;
+              const observer = new MutationObserver(() => {
+                if (debounceTimer) clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(scanAndDismiss, 150);
+              });
+
+              const targetNode = document.body || document.documentElement;
+              if (targetNode) {
+                observer.observe(targetNode, { childList: true, subtree: true });
+                console.log(
+                  `%c[防登出助手]%c [${new Date().toLocaleTimeString()}] [${frameLabel}] MutationObserver 0秒即時監聽器掛載成功 ⚡`,
+                  "color: #1a73e8; font-weight: bold;",
+                  "color: auto;"
+                );
+              }
+            },
+          });
+        } catch (e) {}
+      }
 
       updateUI(true, selectedMode);
     }

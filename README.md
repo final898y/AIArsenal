@@ -111,7 +111,7 @@
 | 套件 ID | 套件名稱 | 類別 | 架構 / 模式 | 最新版本 | 檔案路徑 | 說明 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `cambridge-dictionary-lookup` | 劍橋雙解詞典快速查詢 | 語言學習 / 閱讀輔助 | Chrome MV3 (Context Menu) | `v1.0.0` | [`browser-extensions/cambridge-dictionary-lookup/`](browser-extensions/cambridge-dictionary-lookup/README.md) | 選取網頁文字後透過右鍵選單，快速直達劍橋官方繁體中文雙解詞典查詢釋義與例句。 |
-| `anti-logout-assistant` | 防登出雙模式助手 | 工作生產力 / 連線維持 | Chrome MV3 (Alarms + Scripting) | `v2.2.0` | [`browser-extensions/anti-logout-assistant/`](browser-extensions/anti-logout-assistant/README.md) | 支援 e等公務園背景維持（Session 探測、防誤點閒置提醒自動關閉、跨框架穿透）與一般網頁定時重整之雙模式工具。 |
+| `anti-logout-assistant` | 防登出雙模式助手 | 工作生產力 / 連線維持 | Chrome MV3 (Alarms + Observer) | `v2.3.0` | [`browser-extensions/anti-logout-assistant/`](browser-extensions/anti-logout-assistant/README.md) | 支援 e等公務園雙軌維持（MutationObserver 0秒即時攔截彈窗、Session 探測）與一般網頁定時重整之雙模式工具。 |
 
 ---
 

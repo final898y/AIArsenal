@@ -2,12 +2,155 @@
  * 防登出雙模式助手 (Dual-Mode Anti-Logout Assistant)
  *
  * @description Chrome 擴充套件 (Manifest V3) - 背景服務工作線程 (Service Worker)
- * 負責定時連線維持、前端安全防閒置點擊、合成活躍事件與生命週期資源回收。
- * @version 2.2.0
+ * 負責定時連線維持、MutationObserver 即時彈窗攔截 (0秒響應)、活躍事件模擬與生命週期資源回收。
+ * @version 2.3.0
  * @author AIArsenal
  */
 
 const ALARM_PREFIX = "keep_alive_";
+
+/**
+ * 注入至網頁（各框架）的即時防閒置監聽器函式 (MutationObserver)
+ * 只要畫面或子框架動態插入閒置對話框，0秒即刻自動點擊確認並派發活躍事件。
+ */
+function initRealtimeIdleWatcher() {
+  if (window.__ANTI_LOGOUT_OBSERVER_ACTIVE__) return;
+  window.__ANTI_LOGOUT_OBSERVER_ACTIVE__ = true;
+
+  const isTop = window === window.top;
+  const frameLabel = isTop ? "頂層框架" : `子框架 (${window.location.pathname})`;
+  let lastClickTime = 0;
+
+  const safeKeywords = [
+    "確定",
+    "繼續",
+    "延長",
+    "知道了",
+    "繼續上課",
+    "延長連線",
+    "確定延長",
+  ];
+  const dangerKeywords = [
+    "登出",
+    "交卷",
+    "送出",
+    "刪除",
+    "放棄",
+    "取消",
+    "離開",
+    "結束",
+  ];
+
+  const isElementVisible = (el) => {
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    if (
+      style.display === "none" ||
+      style.visibility === "hidden" ||
+      style.opacity === "0"
+    ) {
+      return false;
+    }
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  };
+
+  const scanAndDismiss = () => {
+    // 限制 1 秒內不重複觸發，避免短時間內連點
+    if (Date.now() - lastClickTime < 1000) return;
+
+    try {
+      const pageText = document.body ? document.body.innerText : "";
+      const pageHasIdleAlert =
+        /閒置|逾時|尚未操作|連線中斷|即將登出|自動登出|延長學習/.test(pageText);
+
+      const clickableElements = document.querySelectorAll(
+        'button, input[type="button"], input[type="submit"], a, div[role="button"]'
+      );
+
+      for (const el of clickableElements) {
+        if (!isElementVisible(el)) continue;
+
+        const text = (el.textContent || el.value || "").trim();
+        if (!text) continue;
+
+        // 若包含危險字詞，絕對跳過
+        if (dangerKeywords.some((danger) => text.includes(danger))) continue;
+
+        // 檢查文字是否符合安全關鍵字
+        const isMatch = safeKeywords.some(
+          (kw) => text === kw || text.includes(kw)
+        );
+
+        if (isMatch) {
+          const isInModal = !!el.closest(
+            '.modal, .dialog, [role="dialog"], [role="alertdialog"], .alert, .swal2-container, .layui-layer, .fancybox-wrap, #idleDialog'
+          );
+
+          if (isInModal || pageHasIdleAlert) {
+            el.click();
+            lastClickTime = Date.now();
+            console.log(
+              `%c[防登出助手 ⚡ 即時攔截]%c [${new Date().toLocaleTimeString()}] [${frameLabel}] 偵測到閒置彈窗，0 秒自動點擊確認按鈕：「${text}」`,
+              "background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;",
+              "color: auto;"
+            );
+
+            // 立即派發原生活躍事件重置前端計時器
+            try {
+              ["mousemove", "keydown", "scroll"].forEach((evtName) => {
+                window.dispatchEvent(new Event(evtName, { bubbles: true }));
+                document.dispatchEvent(new Event(evtName, { bubbles: true }));
+              });
+            } catch (e) {}
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      // 略過異常
+    }
+  };
+
+  // 1. 初次載入立刻掃描一次
+  scanAndDismiss();
+
+  // 2. 掛載 MutationObserver 即時監聽 DOM 動態變更 (150ms 輕量防抖)
+  let debounceTimer = null;
+  const observer = new MutationObserver(() => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(scanAndDismiss, 150);
+  });
+
+  const targetNode = document.body || document.documentElement;
+  if (targetNode) {
+    observer.observe(targetNode, { childList: true, subtree: true });
+    console.log(
+      `%c[防登出助手]%c [${new Date().toLocaleTimeString()}] [${frameLabel}] MutationObserver 0秒即時監聽器掛載成功 ⚡`,
+      "color: #1a73e8; font-weight: bold;",
+      "color: auto;"
+    );
+  } else {
+    document.addEventListener("DOMContentLoaded", () => {
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  }
+}
+
+/**
+ * 向目標分頁（包含所有子框架）注入 MutationObserver 即時監聽器
+ * @param {number} tabId 分頁識別碼
+ */
+async function injectRealtimeWatcher(tabId) {
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId, allFrames: true },
+      func: initRealtimeIdleWatcher,
+    });
+  } catch (err) {
+    // 分頁可能正在重載或無注入權限
+  }
+}
 
 // 監聽鬧鐘觸發事件 (Alarms API)
 chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -45,10 +188,13 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   );
 
   if (mode === "elearn") {
-    // 模式一：e等公務園專用模式（Session 探測 + 精準防閒置彈窗關閉 + 活躍事件模擬）
+    // 確保即時監聽器掛載（雙重保險）
+    injectRealtimeWatcher(tabId);
+
+    // 模式一：定時維持任務（Session 探測 + 定時 DOM 掃描 + 活躍事件派發）
     chrome.scripting.executeScript(
       {
-        target: { tabId: tabId, allFrames: true }, // 原生穿透所有子框架 (跨域 SCORM/影音)
+        target: { tabId: tabId, allFrames: true },
         func: () => {
           const isTop = window === window.top;
           const frameLabel = isTop ? "頂層框架" : `子框架 (${window.location.pathname})`;
@@ -64,7 +210,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             eventDispatched: false,
           };
 
-          // --- A. 僅由頂層框架向後端發送 Ping，避免多框架重複轟炸 ---
+          // --- A. 僅由頂層框架向後端發送 Ping ---
           if (isTop) {
             const pingUrl = `${window.location.origin}/online/online.php?_t=${Date.now()}`;
             fetch(pingUrl, {
@@ -91,7 +237,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
               });
           }
 
-          // --- B. 判斷元素是否真實可見 (避免誤點隱藏元素) ---
+          // --- B. 判斷元素是否真實可見 ---
           const isElementVisible = (el) => {
             if (!el) return false;
             const style = window.getComputedStyle(el);
@@ -106,7 +252,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             return rect.width > 0 && rect.height > 0;
           };
 
-          // --- C. 精準比對閒置彈窗確認按鈕 (防範誤點送出/交卷/登出) ---
+          // --- C. 比對閒置確認按鈕並執行點擊 ---
           try {
             const safeKeywords = [
               "確定",
@@ -138,10 +284,8 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
               const text = (el.textContent || el.value || "").trim();
               if (!text) continue;
 
-              // 若包含危險字詞，絕對跳過
               if (dangerKeywords.some((danger) => text.includes(danger))) continue;
 
-              // 檢查文字是否符合安全關鍵字
               const isMatch = safeKeywords.some(
                 (keyword) => text === keyword || text.includes(keyword)
               );
@@ -159,7 +303,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
                   el.click();
                   resultPayload.clickedButton = text;
                   console.log(
-                    `%c[防登出助手]%c [${frameTime}] [${frameLabel}] 成功自動點擊閒置確認按鈕：「${text}」`,
+                    `%c[防登出助手]%c [${frameTime}] [${frameLabel}] 定時掃描：成功點擊閒置確認按鈕：「${text}」`,
                     "color: #28a745; font-weight: bold",
                     "color: auto"
                   );
@@ -167,11 +311,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
                 }
               }
             }
-          } catch (e) {
-            // 忽略 DOM 查詢異常
-          }
+          } catch (e) {}
 
-          // --- D. 派發原生活躍事件 (重置前端防閒置監聽器) ---
+          // --- D. 派發原生活躍事件 ---
           try {
             ["mousemove", "keydown", "scroll"].forEach((evtName) => {
               window.dispatchEvent(new Event(evtName, { bubbles: true }));
@@ -184,7 +326,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         },
       },
       (results) => {
-        // 在 Service Worker 背景主控台輸出結構化執行報告
         if (chrome.runtime.lastError) {
           console.warn(
             `[防登出助手] [${timeStr}] 注入腳本異常:`,
@@ -236,7 +377,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-// 當分頁載入完成時，維持工具列圖示狀態徽章 (Badge)
+// 當分頁更新或載入完成時，維持狀態徽章並自動掛載即時監聽器
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.status === "complete") {
     const alarmName = ALARM_PREFIX + tabId;
@@ -252,6 +393,11 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
         tabId: tabId,
         color: badgeColor,
       });
+
+      // 若該分頁為 e等公務園模式，在分頁載入完成時即刻掛載 MutationObserver 0秒即時監聽器
+      if (mode === "elearn") {
+        injectRealtimeWatcher(tabId);
+      }
     }
   }
 });
